@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -8,8 +12,13 @@ export class PermissionsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreatePermissionDto) {
-    const existing = await this.prisma.permission.findUnique({ where: { code: dto.code } });
-    if (existing) throw new ConflictException(`Permission code "${dto.code}" already exists`);
+    const existing = await this.prisma.permission.findUnique({
+      where: { code: dto.code },
+    });
+    if (existing)
+      throw new ConflictException(
+        `Permission code "${dto.code}" already exists`,
+      );
     return this.prisma.permission.create({ data: dto });
   }
 

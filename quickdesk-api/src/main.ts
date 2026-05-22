@@ -9,7 +9,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,       // strip unknown fields
+      whitelist: true, // strip unknown fields
       forbidNonWhitelisted: true,
       transform: true,
     }),
@@ -25,4 +25,4 @@ async function bootstrap() {
   console.log(`QuickDesk API running on http://localhost:${port}/api`);
 }
 
-bootstrap();
+void bootstrap();

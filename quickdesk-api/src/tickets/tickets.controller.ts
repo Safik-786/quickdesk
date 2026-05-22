@@ -1,5 +1,11 @@
 import {
-  Controller, Get, Post, Patch, Body, Param, Query,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
@@ -7,6 +13,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { JwtUser } from '../auth/interfaces/jwt-user.interface';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { OverrideTicketDto } from './dto/override-ticket.dto';
 import { ReplyTicketDto } from './dto/reply-ticket.dto';
@@ -20,14 +27,14 @@ export class TicketsController {
   // Employee: submit a ticket
   @Post()
   @Roles('employee')
-  create(@Body() dto: CreateTicketDto, @CurrentUser() user: any) {
+  create(@Body() dto: CreateTicketDto, @CurrentUser() user: JwtUser) {
     return this.ticketsService.create(dto, user.id);
   }
 
   // Employee: view own tickets
   @Get('mine')
   @Roles('employee')
-  findMine(@CurrentUser() user: any) {
+  findMine(@CurrentUser() user: JwtUser) {
     return this.ticketsService.findMine(user.id);
   }
 
@@ -58,7 +65,7 @@ export class TicketsController {
   override(
     @Param('id') id: string,
     @Body() dto: OverrideTicketDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: JwtUser,
   ) {
     return this.ticketsService.override(id, dto, user.id);
   }
@@ -69,7 +76,7 @@ export class TicketsController {
   reply(
     @Param('id') id: string,
     @Body() dto: ReplyTicketDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: JwtUser,
   ) {
     return this.ticketsService.reply(id, dto, user.id);
   }

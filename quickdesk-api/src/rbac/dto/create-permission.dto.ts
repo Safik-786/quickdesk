@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsOptional, Matches, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreatePermissionDto {
   @IsString()
@@ -20,6 +26,8 @@ export class CreatePermissionDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[A-Z_]+$/, { message: 'module must be uppercase letters and underscores' })
+  @Matches(/^[A-Z_]+$/, {
+    message: 'module must be uppercase letters and underscores',
+  })
   module: string;
 }

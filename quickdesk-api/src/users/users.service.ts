@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { LegacyRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface CreateUserInput {
   email: string;
   name: string;
   passwordHash: string;
-  role: 'employee' | 'agent';
+  legacyRole: LegacyRole;
 }
 
 @Injectable()
@@ -26,7 +27,13 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
-      select: { id: true, email: true, name: true, role: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        legacyRole: true,
+        createdAt: true,
+      },
     });
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -17,7 +21,7 @@ interface DraftReplyInput {
   description: string;
 }
 
-interface DraftReplyResult {
+export interface DraftReplyResult {
   draft: string;
   citations: string[];
 }
@@ -34,8 +38,9 @@ export class AiClientService {
         this.http.post<ClassifyResult>('/classify', input),
       );
       return response.data;
-    } catch (error) {
-      this.logger.error('AI classify failed, using fallback', error?.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('AI classify failed, using fallback', message);
       // Graceful fallback — ticket still gets created
       return { category: 'Other', priority: 'Medium' };
     }
@@ -47,9 +52,12 @@ export class AiClientService {
         this.http.post<DraftReplyResult>('/draft-reply', input),
       );
       return response.data;
-    } catch (error) {
-      this.logger.error('AI draft-reply failed', error?.message);
-      throw new ServiceUnavailableException('AI service is currently unavailable');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('AI draft-reply failed', message);
+      throw new ServiceUnavailableException(
+        'AI service is currently unavailable',
+      );
     }
   }
 }

@@ -1,6 +1,11 @@
 import {
-  Controller, Get, Post, Delete,
-  Body, Param, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
 } from '@nestjs/common';
 import { UserRolesService } from './user-roles.service';
 import { AssignRolesDto } from './dto/assign-roles.dto';
@@ -8,6 +13,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { JwtUser } from '../auth/interfaces/jwt-user.interface';
 
 @Controller('rbac/users')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -34,7 +40,7 @@ export class UserRolesController {
   syncUserRoles(
     @Param('userId') userId: string,
     @Body() dto: AssignRolesDto,
-    @CurrentUser() actor: any,
+    @CurrentUser() actor: JwtUser,
   ) {
     return this.userRolesService.syncUserRoles(userId, dto.roleIds, actor.id);
   }
@@ -45,7 +51,7 @@ export class UserRolesController {
   assignRole(
     @Param('userId') userId: string,
     @Param('roleId') roleId: string,
-    @CurrentUser() actor: any,
+    @CurrentUser() actor: JwtUser,
   ) {
     return this.userRolesService.assignRole(userId, roleId, actor.id);
   }

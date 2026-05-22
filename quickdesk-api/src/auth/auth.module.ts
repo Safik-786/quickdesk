@@ -12,8 +12,10 @@ import { UsersModule } from '../users/users.module';
     PassportModule,
     JwtModule.registerAsync({
       useFactory: () => ({
-        secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+        secret: process.env.JWT_SECRET ?? 'dev-secret-change-me',
+        signOptions: {
+          expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as `${number}d`,
+        },
       }),
     }),
   ],

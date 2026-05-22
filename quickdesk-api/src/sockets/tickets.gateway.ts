@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import { Ticket } from '@prisma/client';
 
 @WebSocketGateway({
   cors: {
@@ -17,7 +18,9 @@ import { Logger } from '@nestjs/common';
   },
   namespace: '/',
 })
-export class TicketsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class TicketsGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -38,22 +41,24 @@ export class TicketsGateway implements OnGatewayConnection, OnGatewayDisconnect 
     @ConnectedSocket() client: Socket,
   ) {
     if (data.role === 'agent') {
-      client.join('agents');
+      void client.join('agents');
       this.logger.log(`Agent ${data.userId} joined agents room`);
     } else {
-      client.join(`employee:${data.userId}`);
+      void client.join(`employee:${data.userId}`);
       this.logger.log(`Employee ${data.userId} joined their room`);
     }
   }
 
   // Called by TicketsService when a new ticket is created
-  notifyNewTicket(ticket: any) {
+  notifyNewTicket(ticket: Ticket) {
     this.server.to('agents').emit('ticket:created', ticket);
   }
 
   // Called by TicketsService when a ticket is resolved
-  notifyTicketResolved(ticket: any) {
-    this.server.to(`employee:${ticket.employeeId}`).emit('ticket:resolved', ticket);
+  notifyTicketResolved(ticket: Ticket) {
+    this.server
+      .to(`employee:${ticket.employeeId}`)
+      .emit('ticket:resolved', ticket);
     this.server.to('agents').emit('ticket:resolved', ticket);
   }
 }

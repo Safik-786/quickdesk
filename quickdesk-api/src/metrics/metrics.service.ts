@@ -49,10 +49,14 @@ export class MetricsService {
     }
 
     // AI override rate for category
-    const categoryOverrides = auditLogs.filter((l) => l.field === 'category').length;
+    const categoryOverrides = auditLogs.filter(
+      (l) => l.field === 'category',
+    ).length;
     const totalTickets = tickets.length;
     const overrideRate =
-      totalTickets > 0 ? Math.round((categoryOverrides / totalTickets) * 100) : 0;
+      totalTickets > 0
+        ? Math.round((categoryOverrides / totalTickets) * 100)
+        : 0;
 
     return {
       byStatus,

@@ -14,12 +14,6 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     if (!user || !token) {
-      if (socket) {
-        socket.disconnect();
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setSocket(null);
-        setConnected(false);
-      }
       return;
     }
 
@@ -29,18 +23,28 @@ export function SocketProvider({ children }) {
       reconnectionDelay: 2000,
     });
 
-    newSocket.on('connect', () => {
+    const handleConnect = () => {
+      setSocket(newSocket);
       setConnected(true);
-      newSocket.emit('join', { role: user.role, userId: user.id });
-    });
+      newSocket.emit('join', {
+        role: user.role || user.legacyRole,
+        userId: user.id,
+      });
+    };
 
-    newSocket.on('disconnect', () => setConnected(false));
+    const handleDisconnect = () => {
+      setConnected(false);
+    };
 
-    setSocket(newSocket);
+    newSocket.on('connect', handleConnect);
+    newSocket.on('disconnect', handleDisconnect);
 
     return () => {
+      newSocket.off('connect', handleConnect);
+      newSocket.off('disconnect', handleDisconnect);
       newSocket.disconnect();
       setSocket(null);
+      setConnected(false);
     };
   }, [user, token]);
 

@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, Matches, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateRoleDto {
   @IsString()
@@ -8,7 +15,9 @@ export class CreateRoleDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[A-Z_]+$/, { message: 'code must be uppercase letters and underscores' })
+  @Matches(/^[A-Z_]+$/, {
+    message: 'code must be uppercase letters and underscores',
+  })
   code: string;
 
   @IsOptional()

@@ -14,8 +14,11 @@ export class RolesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateRoleDto) {
-    const existing = await this.prisma.rbacRole.findUnique({ where: { code: dto.code } });
-    if (existing) throw new ConflictException(`Role code "${dto.code}" already exists`);
+    const existing = await this.prisma.rbacRole.findUnique({
+      where: { code: dto.code },
+    });
+    if (existing)
+      throw new ConflictException(`Role code "${dto.code}" already exists`);
     return this.prisma.rbacRole.create({ data: dto });
   }
 
@@ -55,7 +58,8 @@ export class RolesService {
 
   async remove(id: string) {
     const role = await this.findOne(id);
-    if (role.isSystem) throw new ForbiddenException('Cannot delete system roles');
+    if (role.isSystem)
+      throw new ForbiddenException('Cannot delete system roles');
     return this.prisma.rbacRole.delete({ where: { id } });
   }
 
@@ -75,7 +79,10 @@ export class RolesService {
     await this.prisma.$transaction([
       this.prisma.rolePermission.deleteMany({ where: { roleId } }),
       this.prisma.rolePermission.createMany({
-        data: dto.permissionIds.map((permissionId) => ({ roleId, permissionId })),
+        data: dto.permissionIds.map((permissionId) => ({
+          roleId,
+          permissionId,
+        })),
         skipDuplicates: true,
       }),
     ]);

@@ -1,11 +1,19 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AiClientService } from '../ai-client/ai-client.service';
+import {
+  AiClientService,
+  type DraftReplyResult,
+} from '../ai-client/ai-client.service';
 import { AuditService } from '../audit/audit.service';
 import { TicketsGateway } from '../sockets/tickets.gateway';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { OverrideTicketDto } from './dto/override-ticket.dto';
 import { ReplyTicketDto } from './dto/reply-ticket.dto';
+import { Prisma } from '@prisma/client';
 import { TicketFilterDto } from './dto/ticket-filter.dto';
 
 @Injectable()
@@ -52,9 +60,11 @@ export class TicketsService {
   }
 
   async findAll(filters: TicketFilterDto) {
-    const where: any = {};
+    const where: Prisma.TicketWhereInput = {};
 
-    if (filters.status) where.status = filters.status;
+    if (filters.status) {
+      where.status = filters.status as Prisma.EnumTicketStatusFilter['equals'];
+    }
     if (filters.category) where.agentCategory = filters.category;
     if (filters.priority) where.agentPriority = filters.priority;
     if (filters.search) {
@@ -83,7 +93,7 @@ export class TicketsService {
     return ticket;
   }
 
-  async getDraftReply(id: string) {
+  async getDraftReply(id: string): Promise<DraftReplyResult> {
     const ticket = await this.findOne(id);
 
     const result = await this.aiClient.draftReply({
@@ -103,22 +113,34 @@ export class TicketsService {
   async override(id: string, dto: OverrideTicketDto, agentId: string) {
     const ticket = await this.findOne(id);
 
-    const updates: any = {};
-    const auditEntries: Promise<any>[] = [];
+    const updates: Prisma.TicketUpdateInput = {};
+    const auditEntries: Promise<unknown>[] = [];
 
     if (dto.category !== undefined && dto.category !== ticket.agentCategory) {
-      const from = ticket.agentCategory ?? ticket.aiCategory;
+      const from = ticket.agentCategory ?? ticket.aiCategory ?? '';
       updates.agentCategory = dto.category;
       auditEntries.push(
-        this.auditService.log({ ticketId: id, agentId, field: 'category', from, to: dto.category }),
+        this.auditService.log({
+          ticketId: id,
+          agentId,
+          field: 'category',
+          from,
+          to: dto.category,
+        }),
       );
     }
 
     if (dto.priority !== undefined && dto.priority !== ticket.agentPriority) {
-      const from = ticket.agentPriority ?? ticket.aiPriority;
+      const from = ticket.agentPriority ?? ticket.aiPriority ?? '';
       updates.agentPriority = dto.priority;
       auditEntries.push(
-        this.auditService.log({ ticketId: id, agentId, field: 'priority', from, to: dto.priority }),
+        this.auditService.log({
+          ticketId: id,
+          agentId,
+          field: 'priority',
+          from,
+          to: dto.priority,
+        }),
       );
     }
 

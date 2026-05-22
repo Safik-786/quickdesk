@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { PrismaService } from '../../prisma/prisma.service';
+import { JwtUser, RequestWithUser } from '../interfaces/jwt-user.interface';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -16,23 +17,24 @@ export class PermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     // No permissions required — allow through
     if (!requiredPermissions || requiredPermissions.length === 0) return true;
 
-    const { user } = context.switchToHttp().getRequest();
+    const { user } = context.switchToHttp().getRequest<RequestWithUser>();
     if (!user) throw new ForbiddenException('Not authenticated');
+    const authUser: JwtUser = user;
 
     // Admin (legacy) bypass — admins have all permissions
-    if (user.legacyRole === 'admin') return true;
+    if (authUser.legacyRole === 'admin') return true;
 
     // Load user's permission codes via their RBAC roles
     const userRoles = await this.prisma.userRole.findMany({
-      where: { userId: user.id },
+      where: { userId: authUser.id },
       include: {
         role: {
           include: {

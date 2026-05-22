@@ -1,6 +1,12 @@
 import {
-  Controller, Get, Post, Patch, Delete,
-  Body, Param, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -57,14 +63,20 @@ export class RolesController {
   /** Add a single permission */
   @Post(':id/permissions/:permissionId')
   @RequirePermissions('RBAC.MANAGE')
-  addPermission(@Param('id') id: string, @Param('permissionId') permissionId: string) {
+  addPermission(
+    @Param('id') id: string,
+    @Param('permissionId') permissionId: string,
+  ) {
     return this.rolesService.addPermission(id, permissionId);
   }
 
   /** Remove a single permission */
   @Delete(':id/permissions/:permissionId')
   @RequirePermissions('RBAC.MANAGE')
-  removePermission(@Param('id') id: string, @Param('permissionId') permissionId: string) {
+  removePermission(
+    @Param('id') id: string,
+    @Param('permissionId') permissionId: string,
+  ) {
     return this.rolesService.removePermission(id, permissionId);
   }
 }

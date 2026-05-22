@@ -1,5 +1,10 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { LegacyRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -17,14 +22,15 @@ export class AuthService {
     if (existing) throw new ConflictException('Email already in use');
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
+    const legacyRole: LegacyRole = dto.role ?? LegacyRole.employee;
     const user = await this.usersService.create({
       email: dto.email,
       name: dto.name,
       passwordHash,
-      role: dto.role ?? 'employee',
+      legacyRole,
     });
 
-    return this.signToken(user.id, user.email, user.role);
+    return this.signToken(user.id, user.email, user.legacyRole);
   }
 
   async login(dto: LoginDto) {
@@ -34,10 +40,10 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
 
-    return this.signToken(user.id, user.email, user.role);
+    return this.signToken(user.id, user.email, user.legacyRole);
   }
 
-  private signToken(userId: string, email: string, role: string) {
+  private signToken(userId: string, email: string, role: LegacyRole) {
     const payload = { sub: userId, email, role };
     return {
       access_token: this.jwtService.sign(payload),
