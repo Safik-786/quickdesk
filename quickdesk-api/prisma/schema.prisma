@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Legacy simple role enum (kept for backward compat on User.legacyRole) ───
+enum LegacyRole {
+  employee
+  agent
+  admin
+}
+
+enum TicketStatus {
+  open
+  resolved
+}
+
+// ─────────────────────────────────────────────
+//  RBAC Core Models
+// ─────────────────────────────────────────────
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   // e.g. "Create User"
+  code        String   @unique // e.g. "USER.CREATE"
+  description String?
+  module      String   // e.g. "USER", "TICKET", "METRICS"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+}
+
+model RbacRole {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. "Support Agent"
+  code        String   @unique // e.g. "AGENT"
+  description String?
+  isSystem    Boolean  @default(false) // system roles can't be deleted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+}
+
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  grantedAt    DateTime @default(now())
+
+  role       RbacRole   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  grantedAt DateTime @default(now())
+  grantedBy String?  // userId of admin who assigned
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role RbacRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+// ─────────────────────────────────────────────
+//  Application Models
+// ─────────────────────────────────────────────
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String
+  passwordHash String
+  legacyRole   LegacyRole  @default(employee)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  tickets      Ticket[]    @relation("EmployeeTickets")
+  resolved     Ticket[]    @relation("ResolvedByAgent")
+  auditLogs    AuditLog[]
+  userRoles    UserRole[]
+}
+
+model Ticket {
+  id                 String       @id @default(cuid())
+  title              String
+  description        String
+  attachmentFilename String?
+  status             TicketStatus @default(open)
+
+  aiCategory    String?
+  aiPriority    String?
+  aiDraft       String?
+  citations     String[]
+
+  agentCategory String?
+  agentPriority String?
+  finalReply    String?
+
+  employeeId   String
+  employee     User     @relation("EmployeeTickets", fields: [employeeId], references: [id])
+
+  resolvedById String?
+  resolvedBy   User?    @relation("ResolvedByAgent", fields: [resolvedById], references: [id])
+
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  agentId   String
+  agent     User     @relation(fields: [agentId], references: [id])
+  field     String
+  fromValue String
+  toValue   String
+  changedAt DateTime @default(now())
+}

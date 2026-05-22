@@ -1,0 +1,64 @@
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
+import { PrismaService } from '../../prisma/prisma.service';
+
+@Injectable()
+export class PermissionsGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    // No permissions required — allow through
+    if (!requiredPermissions || requiredPermissions.length === 0) return true;
+
+    const { user } = context.switchToHttp().getRequest();
+    if (!user) throw new ForbiddenException('Not authenticated');
+
+    // Admin (legacy) bypass — admins have all permissions
+    if (user.legacyRole === 'admin') return true;
+
+    // Load user's permission codes via their RBAC roles
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId: user.id },
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: { permission: true },
+            },
+          },
+        },
+      },
+    });
+
+    const userPermissionCodes = new Set<string>();
+    for (const ur of userRoles) {
+      for (const rp of ur.role.rolePermissions) {
+        userPermissionCodes.add(rp.permission.code);
+      }
+    }
+
+    // Check all required permissions are present
+    const hasAll = requiredPermissions.every((p) => userPermissionCodes.has(p));
+    if (!hasAll) {
+      throw new ForbiddenException(
+        `Missing required permission(s): ${requiredPermissions.join(', ')}`,
+      );
+    }
+
+    return true;
+  }
+}

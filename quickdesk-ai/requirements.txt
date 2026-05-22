@@ -1,0 +1,23 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-dotenv==1.0.1
+pydantic==2.10.3
+
+# LangChain core
+langchain==0.3.9
+langchain-community==0.3.9
+langchain-core==0.3.21
+
+# LLM providers (install the one you use)
+langchain-openai==0.2.11
+langchain-groq==0.2.1
+
+# Embeddings fallback (HuggingFace, no API key needed)
+langchain-huggingface==0.1.2
+sentence-transformers==3.3.1
+
+# Vector store
+faiss-cpu==1.9.0
+
+# HTTP
+httpx==0.28.1

@@ -1,0 +1,59 @@
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
+
+@WebSocketGateway({
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  },
+  namespace: '/',
+})
+export class TicketsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer()
+  server: Server;
+
+  private readonly logger = new Logger(TicketsGateway.name);
+
+  handleConnection(client: Socket) {
+    this.logger.log(`Client connected: ${client.id}`);
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(`Client disconnected: ${client.id}`);
+  }
+
+  // Client joins a room based on their role or userId
+  @SubscribeMessage('join')
+  handleJoin(
+    @MessageBody() data: { role: string; userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (data.role === 'agent') {
+      client.join('agents');
+      this.logger.log(`Agent ${data.userId} joined agents room`);
+    } else {
+      client.join(`employee:${data.userId}`);
+      this.logger.log(`Employee ${data.userId} joined their room`);
+    }
+  }
+
+  // Called by TicketsService when a new ticket is created
+  notifyNewTicket(ticket: any) {
+    this.server.to('agents').emit('ticket:created', ticket);
+  }
+
+  // Called by TicketsService when a ticket is resolved
+  notifyTicketResolved(ticket: any) {
+    this.server.to(`employee:${ticket.employeeId}`).emit('ticket:resolved', ticket);
+    this.server.to('agents').emit('ticket:resolved', ticket);
+  }
+}
