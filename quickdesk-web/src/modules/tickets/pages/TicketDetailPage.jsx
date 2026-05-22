@@ -5,6 +5,21 @@ import { useTicket, useTicketDraft, useReplyTicket, useOverrideTicket } from '..
 import Navbar from '../../core/components/Navbar';
 import AuditLogTable from '../components/AuditLogTable';
 import AIDraftEditor from '../components/AIDraftEditor';
+import Input from '../../core/components/ui/Input';
+import Button from '../../core/components/ui/Button';
+import Dropdown from '../../core/components/ui/Dropdown';
+
+const STATUS_OPTIONS = [
+  { value: 'open', label: 'Open' },
+  { value: 'resolved', label: 'Resolved' },
+  { value: 'closed', label: 'Closed' },
+];
+
+const backIcon = (
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+);
 
 export default function TicketDetailPage() {
   const { id } = useParams();
@@ -27,19 +42,20 @@ export default function TicketDetailPage() {
     });
   };
 
-  const handleStatusChange = (e) => {
-    overrideTicket({ status: e.target.value });
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <button onClick={() => navigate(-1)} className="mb-6 text-sm text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-medium">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          iconLeft={backIcon}
+          className="mb-6 !px-0 text-indigo-600 hover:text-indigo-800 hover:bg-transparent"
+        >
           Back to list
-        </button>
+        </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
@@ -69,28 +85,31 @@ export default function TicketDetailPage() {
             {/* Reply Box */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Reply</h3>
-              <textarea
+              <Input
                 rows={4}
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder="Type your response here..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm mb-4"
+                className="mb-4"
               />
               <div className="flex justify-between items-center">
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => getDraft()}
                   disabled={isDraftLoading}
-                  className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1"
+                  isLoading={isDraftLoading}
+                  className="!px-0 text-indigo-600 hover:text-indigo-800 hover:bg-transparent"
                 >
                   {isDraftLoading ? 'Generating...' : 'Generate AI Suggestion'}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleReply}
-                  disabled={isReplying || !replyText.trim()}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition"
+                  disabled={!replyText.trim()}
+                  isLoading={isReplying}
                 >
-                  {isReplying ? 'Sending...' : 'Send Reply'}
-                </button>
+                  Send Reply
+                </Button>
               </div>
             </div>
             
@@ -116,21 +135,13 @@ export default function TicketDetailPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Ticket Actions</h3>
               
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Change Status</label>
-                  <select
-                    value={ticket.status}
-                    onChange={handleStatusChange}
-                    disabled={isOverriding}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
-                  >
-                    <option value="open">Open</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                </div>
-              </div>
+              <Dropdown
+                label="Change Status"
+                value={ticket.status}
+                onChange={(status) => overrideTicket({ status })}
+                options={STATUS_OPTIONS}
+                disabled={isOverriding}
+              />
             </div>
 
             {/* Audit Log */}

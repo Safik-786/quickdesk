@@ -1,10 +1,18 @@
 
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useMyTickets } from '../tickets.hooks';
 import Navbar from '../../core/components/Navbar';
 import TicketCard from '../components/TicketCard';
+import Button from '../../core/components/ui/Button';
+
+const plusIcon = (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+);
 
 export default function MyTicketsPage() {
+  const navigate = useNavigate();
   const { data: tickets, isLoading, error } = useMyTickets();
 
   return (
@@ -17,15 +25,9 @@ export default function MyTicketsPage() {
             <h1 className="text-3xl font-bold text-gray-900">My Tickets</h1>
             <p className="text-gray-500 mt-2">Track the status of your reported issues.</p>
           </div>
-          <Link
-            to="/submit"
-            className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+          <Button iconLeft={plusIcon} onClick={() => navigate('/submit')}>
             New Ticket
-          </Link>
+          </Button>
         </div>
 
         {isLoading ? (

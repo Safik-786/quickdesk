@@ -1,6 +1,7 @@
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import Button from './ui/Button';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -57,12 +58,9 @@ export default function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-700 font-medium">{user?.name} <span className="text-gray-400 font-normal">({user?.role || user?.legacyRole})</span></span>
-              <button
-                onClick={handleLogout}
-                className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium transition"
-              >
+              <Button variant="secondary" size="sm" onClick={handleLogout}>
                 Logout
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ export default function Dropdown({
   placeholder = 'Select an option',
   label,
   error,
+  disabled = false,
   className = ''
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,11 +34,13 @@ export default function Dropdown({
       )}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`
           relative w-full bg-white border rounded-lg pl-3.5 pr-10 py-2.5 text-left cursor-default 
           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors
           ${error ? 'border-red-300 text-red-900 focus:ring-red-500' : 'border-gray-300'}
+          ${disabled ? 'opacity-60 cursor-not-allowed bg-gray-50' : ''}
         `}
       >
         <span className={`block truncate ${!selectedOption ? 'text-gray-400' : 'text-gray-900'}`}>

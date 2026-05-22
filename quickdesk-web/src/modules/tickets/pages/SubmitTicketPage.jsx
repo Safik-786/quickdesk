@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubmitTicket } from '../tickets.hooks';
 import Navbar from '../../core/components/Navbar';
+import Input from '../../core/components/ui/Input';
+import Button from '../../core/components/ui/Button';
 
 export default function SubmitTicketPage() {
   const navigate = useNavigate();
@@ -34,42 +36,38 @@ export default function SubmitTicketPage() {
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Subject</label>
-              <input
-                type="text" required
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                placeholder="Brief description of the issue"
-              />
-            </div>
+            <Input
+              label="Subject"
+              type="text"
+              required
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="Brief description of the issue"
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-              <textarea
-                required rows={6}
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                placeholder="Please provide as much detail as possible..."
-              />
-            </div>
+            <Input
+              label="Description"
+              rows={6}
+              required
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="Please provide as much detail as possible..."
+            />
 
             <div className="flex justify-end gap-3 pt-4">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={() => navigate('/my-tickets')}
-                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
-              </button>
-              <button
-                type="submit" disabled={isPending}
-                className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-70 flex items-center gap-2"
+              </Button>
+              <Button
+                type="submit"
+                isLoading={isPending}
               >
-                {isPending ? 'Submitting...' : 'Submit Ticket'}
-              </button>
+                Submit Ticket
+              </Button>
             </div>
           </form>
         </div>

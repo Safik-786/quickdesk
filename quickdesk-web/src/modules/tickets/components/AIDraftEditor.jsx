@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import Input from '../../core/components/ui/Input';
+import Button from '../../core/components/ui/Button';
 
 export default function AIDraftEditor({ draftText, onApply }) {
   const [text, setText] = useState('');
@@ -18,19 +20,16 @@ export default function AIDraftEditor({ draftText, onApply }) {
         </svg>
         <h4 className="font-semibold text-indigo-900">AI Suggested Reply</h4>
       </div>
-      <textarea
+      <Input
+        rows={4}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="w-full p-3 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[100px] text-sm text-gray-700 bg-white"
         placeholder="Generating suggestion..."
       />
       <div className="mt-3 flex justify-end">
-        <button
-          onClick={() => onApply(text)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-        >
+        <Button onClick={() => onApply(text)}>
           Use Suggestion
-        </button>
+        </Button>
       </div>
     </div>
   );
