@@ -6,7 +6,7 @@ export default function MetricsPage() {
   const { data: metricsData, isLoading, isError, error } = useMetricsSummary();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen rounded-xl shadow bg-white">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">System Metrics</h1>

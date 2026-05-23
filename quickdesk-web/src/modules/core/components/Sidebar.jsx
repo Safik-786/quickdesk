@@ -1,11 +1,15 @@
 import { NavLink } from 'react-router-dom';
+import { useContext } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { usePermission } from '../hooks/usePermission';
 import { ROLES, PERMISSIONS } from '../../../constants/rbac';
+import logoSrc from '../../../assets/logos/logo.jpeg';
+import { SidebarContext } from '../../../context/SidebarContext';
 
 export default function Sidebar() {
   const { user } = useAuth();
   const { hasPermission } = usePermission();
+  const { isCollapsed } = useContext(SidebarContext);
 
   const userRoleCodes = user?.roles?.map(r => r.code) || [];
   const isAdmin = userRoleCodes.includes(ROLES.ADMIN);
@@ -23,7 +27,7 @@ export default function Sidebar() {
       show: userRoleCodes.includes(ROLES.AGENT) || isAdmin
     },
     {
-      name: 'Submit Ticket',
+      name: 'New Ticket',
       path: '/submit',
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,46 +56,66 @@ export default function Sidebar() {
       ),
       // Using proper permission checking
       show: hasPermission(PERMISSIONS.METRICS_READ) || isAdmin
+    },
+    {
+      name: 'RBAC Control',
+      path: '/rbac',
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      ),
+      show: isAdmin
     }
   ];
 
   return (
-    <aside className="fixed inset-y-0 left-0 w-64 bg-gray-900 border-r border-gray-800 hidden md:flex flex-col z-10 transition-all duration-300">
-      <div className="flex items-center h-16 px-6 border-b border-gray-800 bg-gray-900">
-        <div className="inline-flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-lg mr-3 shadow-lg shadow-indigo-600/20">
-          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
+    <aside className={`fixed inset-y-0 left-0 bg-white  hidden md:flex flex-col z-10 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+      <div className={`flex items-center h-16 px-4 ${isCollapsed ? 'justify-center' : ''}`}>
+        <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg overflow-hidden bg-white">
+          <img src={logoSrc} alt="QuickDesk logo" className="object-cover w-full h-full" />
         </div>
-        <span className="text-xl font-bold text-white tracking-tight">QuickDesk</span>
+        {!isCollapsed && (
+          <span className="text-2xl font-bold tracking-tight bg-gradient-to-br from-cyan-500 via-blue-700 to-blue-900 text-transparent bg-clip-text">
+            uickDesk
+          </span>
+        )}
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-        <div className="mb-4 text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">Main Menu</div>
+      <nav className="flex-1 px-2 py-6 space-y-2 overflow-y-auto">
+        {!isCollapsed && (
+          <div className="mb-4 text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">Main Menu</div>
+        )}
         {menuItems.filter(item => item.show).map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${
+              `flex  ${isCollapsed ? 'flex-col items-center justify-center' : 'items-start'} px-3 py-2.5 text-sm font-medium rounded-e-full transition-all duration-200 group ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-blue-50  text-blue-800 shadow'
+                  : 'text-blue-950 hover:bg-black/5 hover:text-blue-900'
               }`
             }
+            title={isCollapsed ? item.name : ''}
           >
-            <div className="mr-3 shrink-0">
+            <div className={`${isCollapsed ? '' : 'mr-3'}`}>
               {item.icon}
             </div>
-            {item.name}
+            {!isCollapsed && item.name}
+            {isCollapsed && (
+              <span className="text-[8px] whitespace-nowrap uppercase font-bold mt-1 text-center leading-none">{item.name}</span>
+            )}
           </NavLink>
         ))}
       </nav>
       
-      <div className="p-4 border-t border-gray-800">
-        <div className="flex items-center p-3 bg-gray-800 rounded-xl">
+      <div className="p-2 border-t border-gray-800">
+        <div className={`flex items-center p-3 bg-gray-800 rounded-xl ${isCollapsed ? 'justify-center' : ''}`}>
           <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
-          <span className="text-xs font-medium text-gray-300">System Online</span>
+          {!isCollapsed && (
+            <span className="text-xs font-medium text-gray-300">System Online</span>
+          )}
         </div>
       </div>
     </aside>

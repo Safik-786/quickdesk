@@ -11,6 +11,7 @@ import MyTicketsPage from './modules/tickets/pages/MyTicketsPage';
 import DashboardPage from './modules/tickets/pages/DashboardPage';
 import TicketDetailPage from './modules/tickets/pages/TicketDetailPage';
 import MetricsPage from './modules/metrics/pages/MetricsPage';
+import RBACManagementPage from './modules/rbac/pages/RBACManagementPage';
 import { ROLES } from './constants/rbac';
 
 export default function App() {
@@ -66,6 +67,14 @@ export default function App() {
                 element={
                   <ProtectedRoute role={ROLES.AGENT}>
                     <MetricsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/rbac"
+                element={
+                  <ProtectedRoute role={ROLES.ADMIN}>
+                    <RBACManagementPage />
                   </ProtectedRoute>
                 }
               />

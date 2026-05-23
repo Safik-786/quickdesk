@@ -4,7 +4,6 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LegacyRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { PermissionsService } from '../rbac/permissions.service';
@@ -26,15 +25,26 @@ export class AuthService {
     if (existing) throw new ConflictException('Email already in use');
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
-    const legacyRole: LegacyRole = dto.role ?? LegacyRole.employee;
     const user = await this.usersService.create({
       email: dto.email,
       name: dto.name,
       passwordHash,
-      legacyRole,
     });
 
-    return await this.signToken(user.id, user.email, user.legacyRole);
+    // Assign default role (EMPLOYEE)
+    const employeeRole = await this.prisma.rbacRole.findUnique({
+      where: { code: 'EMPLOYEE' }
+    });
+    if (employeeRole) {
+      await this.prisma.userRole.create({
+        data: {
+          userId: user.id,
+          roleId: employeeRole.id,
+        }
+      });
+    }
+
+    return await this.signToken(user.id, user.email);
   }
 
   async login(dto: LoginDto) {
@@ -44,7 +54,7 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
 
-    return await this.signToken(user.id, user.email, user.legacyRole);
+    return await this.signToken(user.id, user.email);
   }
 
   async refresh(refreshToken: string) {
@@ -61,56 +71,51 @@ export class AuthService {
       const valid = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
       if (!valid) throw new UnauthorizedException('Invalid refresh token');
 
-      return await this.signToken(user.id, user.email, user.legacyRole);
+      return await this.signToken(user.id, user.email);
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  private async signToken(userId: string, email: string, role: LegacyRole) {
-    const payload = { sub: userId, email, role };
+  private async signToken(userId: string, email: string) {
+    const payload = { sub: userId, email };
     
     // Generate tokens
     const access_token = this.jwtService.sign(payload);
     const refresh_token = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret-change-me',
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
+      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '30d') as any,
     });
 
     // Hash and store refresh token
     const hashedRefreshToken = await bcrypt.hash(refresh_token, 10);
     await this.usersService.update(userId, { hashedRefreshToken });
 
+    // Fetch Roles Metadata
+    let roles: any[] = [];
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: { role: true },
+    });
+    roles = userRoles.map(ur => ({
+      code: ur.role.code,
+      name: ur.role.name,
+      description: ur.role.description,
+    }));
+
     // Fetch Permissions
     let permissions: string[] = [];
-    if (role === 'admin') {
+    if (roles.some(r => r.code === 'ADMIN')) {
       permissions = ['*'];
     } else {
       const permSet = await this.permissionsService.getUserPermissionCodes(userId);
       permissions = Array.from(permSet);
     }
 
-    // Fetch Roles Metadata
-    let roles = [];
-    if (role === 'admin') {
-      const adminRole = await this.prisma.rbacRole.findUnique({ where: { code: 'ADMIN' } });
-      if (adminRole) roles.push({ code: adminRole.code, name: adminRole.name, description: adminRole.description });
-    } else {
-      const userRoles = await this.prisma.userRole.findMany({
-        where: { userId },
-        include: { role: true },
-      });
-      roles = userRoles.map(ur => ({
-        code: ur.role.code,
-        name: ur.role.name,
-        description: ur.role.description,
-      }));
-    }
-
     return {
       access_token,
       refresh_token,
-      user: { id: userId, email, role, roles, permissions },
+      user: { id: userId, email, roles, permissions },
     };
   }
 }

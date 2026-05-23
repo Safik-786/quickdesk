@@ -39,6 +39,14 @@ export class RolesController {
     return this.rolesService.findOne(id);
   }
 
+  /** Get all permissions for a specific role */
+  @Get(':id/permissions')
+  @RequirePermissions('RBAC.READ')
+  async getRolePermissions(@Param('id') id: string) {
+    const role = await this.rolesService.findOne(id);
+    return role.rolePermissions.map(rp => rp.permission);
+  }
+
   @Patch(':id')
   @RequirePermissions('RBAC.UPDATE')
   update(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
@@ -54,9 +62,16 @@ export class RolesController {
   // ── Permission assignment ──────────────────────────────────────────────────
 
   /** Full sync: replace all permissions on a role */
-  @Post(':id/permissions/sync')
+  @Post(':id/permissions')
   @RequirePermissions('RBAC.MANAGE')
   syncPermissions(@Param('id') id: string, @Body() dto: AssignPermissionsDto) {
+    return this.rolesService.syncPermissions(id, dto);
+  }
+
+  /** Alternative endpoint for full sync (deprecated, use POST :id/permissions) */
+  @Post(':id/permissions/sync')
+  @RequirePermissions('RBAC.MANAGE')
+  syncPermissionsOld(@Param('id') id: string, @Body() dto: AssignPermissionsDto) {
     return this.rolesService.syncPermissions(id, dto);
   }
 

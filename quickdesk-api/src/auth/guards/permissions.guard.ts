@@ -29,9 +29,6 @@ export class PermissionsGuard implements CanActivate {
     if (!user) throw new ForbiddenException('Not authenticated');
     const authUser: JwtUser = user;
 
-    // Admin (legacy) bypass — admins have all permissions
-    if (authUser.legacyRole === 'admin') return true;
-
     // Load user's permission codes via their RBAC roles
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId: authUser.id },
@@ -48,6 +45,7 @@ export class PermissionsGuard implements CanActivate {
 
     const userPermissionCodes = new Set<string>();
     for (const ur of userRoles) {
+      if (ur.role.code === 'ADMIN') return true; // RBAC admin bypass
       for (const rp of ur.role.rolePermissions) {
         userPermissionCodes.add(rp.permission.code);
       }

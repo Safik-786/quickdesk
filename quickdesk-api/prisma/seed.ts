@@ -152,7 +152,6 @@ async function main() {
       email: 'admin@quickdesk.com',
       name: 'System Admin',
       passwordHash: adminHash,
-      legacyRole: 'admin',
     },
   });
 
@@ -163,7 +162,6 @@ async function main() {
       email: 'agent@quickdesk.com',
       name: 'Support Agent',
       passwordHash: agentHash,
-      legacyRole: 'agent',
     },
   });
 
@@ -174,7 +172,6 @@ async function main() {
       email: 'employee@quickdesk.com',
       name: 'Jane Employee',
       passwordHash: employeeHash,
-      legacyRole: 'employee',
     },
   });
 

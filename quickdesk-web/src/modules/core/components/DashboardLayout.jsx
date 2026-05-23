@@ -1,19 +1,31 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { SidebarProvider, SidebarContext } from '../../../context/SidebarContext';
 
-export default function DashboardLayout() {
+function DashboardLayoutContent() {
+  const { isCollapsed } = useContext(SidebarContext);
+  
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-white overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col md:ml-64 transition-all duration-300">
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         <Header />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/50 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-x-hidden border border-slate-300 rounded-tl-2xl overflow-y-auto bg-blue-50 p-4 sm:p-6">
           <div className="max-w-7xl mx-auto w-full">
             <Outlet />
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function DashboardLayout() {
+  return (
+    <SidebarProvider>
+      <DashboardLayoutContent />
+    </SidebarProvider>
   );
 }

@@ -7,12 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Legacy simple role enum (kept for backward compat on User.legacyRole) ───
-enum LegacyRole {
-  employee
-  agent
-  admin
-}
+
 
 enum TicketStatus {
   open
@@ -83,7 +78,7 @@ model User {
   name         String
   passwordHash       String
   hashedRefreshToken String?
-  legacyRole         LegacyRole  @default(employee)
+
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 

@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { SidebarContext } from '../../../context/SidebarContext';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { toggleSidebar } = useContext(SidebarContext);
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -30,8 +32,18 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 sticky top-0 transition-all duration-300">
-      <div className="flex-1 flex items-center">
+    <header className="h-16 bg-white flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 sticky top-0 transition-all duration-300">
+      <div className="flex-1 flex items-center gap-3">
+        {/* Sidebar Toggle Button */}
+        <button 
+          onClick={toggleSidebar}
+          className="p-2 text-gray-500 cursor-pointer hover:text-blue-800 hover:bg-blue-100 rounded-lg hover:shadow transition-colors" 
+          title="Toggle sidebar"
+        >
+          <svg className="w-5 h-5" fill="blue" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
         {/* Breadcrumbs or Page Title could go here */}
         <h2 className="text-lg font-semibold text-gray-800 hidden sm:block">Welcome back</h2>
       </div>
@@ -51,7 +63,7 @@ export default function Header() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center space-x-3 focus:outline-none p-1 rounded-full hover:bg-gray-50 transition-colors"
           >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-white">
+            <div className="w-8 h-8  rounded-full bg-gradient-to-br from-blue-500 to-blue-800 flex items-center justify-center text-white font-bold shadow text-xs cursor-pointer">
               {getInitials(user?.email)}
             </div>
             <div className="hidden md:block text-left">

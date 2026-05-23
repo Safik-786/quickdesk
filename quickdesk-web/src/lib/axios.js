@@ -30,8 +30,10 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
     
-    // Auto-refresh on 401 (if it's not a retry and not the refresh endpoint itself)
-    if (status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh') {
+    // Auto-refresh on 401 (if it's not a retry and not an auth endpoint)
+    const isAuthEndpoint = originalRequest.url === '/auth/login' || originalRequest.url === '/auth/register' || originalRequest.url === '/auth/refresh';
+    
+    if (status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
           failedQueue.push({ resolve, reject });

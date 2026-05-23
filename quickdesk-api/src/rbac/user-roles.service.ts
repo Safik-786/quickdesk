@@ -89,7 +89,6 @@ export class UserRolesService {
         id: true,
         email: true,
         name: true,
-        legacyRole: true,
         createdAt: true,
         userRoles: {
           include: { role: true },
