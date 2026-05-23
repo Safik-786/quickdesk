@@ -26,7 +26,7 @@ export default function RBACManagementPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-xl shadow-sm p-6">
         <PageHeader 
           title="RBAC Management" 
           description="Manage users, roles, and permissions" 

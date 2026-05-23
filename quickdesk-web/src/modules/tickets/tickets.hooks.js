@@ -4,10 +4,10 @@ import { queryKeys } from '../../lib/queryKeys';
 
 // ── Queries ───────────────────────────────────────────────────────────────────
 
-export function useMyTickets() {
+export function useMyTickets(filters = {}) {
   return useQuery({
-    queryKey: queryKeys.tickets.mine(),
-    queryFn: ticketsApi.getMyTickets,
+    queryKey: [...queryKeys.tickets.mine(), filters],
+    queryFn: () => ticketsApi.getMyTickets(filters),
   });
 }
 

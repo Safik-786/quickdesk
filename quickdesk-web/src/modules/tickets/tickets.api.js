@@ -6,7 +6,12 @@ export const ticketsApi = {
     axiosInstance.post('/tickets', data, {
       headers: { 'Content-Type': undefined }, // let axios set multipart/form-data + boundary from FormData
     }),
-  getMyTickets: () => axiosInstance.get('/tickets/mine'),
+  getMyTickets: (filters = {}) => {
+    const params = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters).filter(([, v]) => v != null && v !== '')),
+    ).toString();
+    return axiosInstance.get(`/tickets/mine${params ? `?${params}` : ''}`);
+  },
 
   // Agent
   getAll: (filters = {}) => {

@@ -66,8 +66,8 @@ export class TicketsController {
   // Employee: view own tickets
   @Get('mine')
   @Roles('employee')
-  findMine(@CurrentUser() user: JwtUser) {
-    return this.ticketsService.findMine(user.id);
+  findMine(@Query() filters: TicketFilterDto, @CurrentUser() user: JwtUser) {
+    return this.ticketsService.findMine(user.id, filters);
   }
 
   // Agent: view all tickets with filters

@@ -45,7 +45,8 @@ export default function TicketTable({
   currentPage = 1, 
   totalPages = 1, 
   totalItems = 0,
-  onPageChange 
+  onPageChange,
+  onView
 }) {
   const itemsPerPage = 10;
 
@@ -112,9 +113,18 @@ export default function TicketTable({
                     {new Date(ticket.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link to={`/tickets/${ticket.id || ticket._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold">
-                      View
-                    </Link>
+                    {onView ? (
+                      <button 
+                        onClick={() => onView(ticket)}
+                        className="text-indigo-600 hover:text-indigo-900 font-semibold cursor-pointer"
+                      >
+                        View
+                      </button>
+                    ) : (
+                      <Link to={`/tickets/${ticket.id || ticket._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold">
+                        View
+                      </Link>
+                    )}
                   </td>
                 </tr>
               ))

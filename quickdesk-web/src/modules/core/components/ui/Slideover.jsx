@@ -13,7 +13,8 @@ export default function Slideover({
   primaryBtnLoading = false,
   primaryBtnType = 'button',
   secondaryBtnText,
-  onSecondaryClick
+  onSecondaryClick,
+  size = 'md' // 'sm' | 'md' | 'lg' | 'xl'
 }) {
   const panelRef = useRef(null);
 
@@ -48,6 +49,14 @@ export default function Slideover({
     };
   }, [isOpen, onClose]);
 
+  const sizeClasses = {
+    sm: 'md:w-[30vw]',
+    md: 'md:w-[40vw]',
+    lg: 'md:w-[60vw]',
+    xl: 'md:w-[80vw]',
+  };
+  const widthClass = sizeClasses[size] || sizeClasses.md;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -69,7 +78,7 @@ export default function Slideover({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="relative z-10 w-screen md:w-[40vw] flex h-full flex-col bg-white shadow-2xl pointer-events-auto border-l border-gray-200"
+            className={`relative z-10 w-screen ${widthClass} flex h-full flex-col bg-white shadow-2xl pointer-events-auto border-l border-gray-200`}
           >
               {/* Header */}
               <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between bg-white z-10">

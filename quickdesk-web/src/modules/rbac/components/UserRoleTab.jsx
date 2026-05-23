@@ -92,7 +92,7 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
           </div>
         )}
 
-        <div className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+        <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg bg-white shadow-sm">
           <div>
             <h3 className="text-sm font-medium text-gray-900">Active Status</h3>
             <p className="text-xs text-gray-500">Allow this user to log in</p>
@@ -118,7 +118,7 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
           <h3 className="text-sm font-medium text-gray-900 mb-3">Assign Roles</h3>
           <div className="space-y-2">
             {roles?.map(role => (
-              <label key={role.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+              <label key={role.id} className={`flex items-center space-x-3 p-3 border border-slate-200 rounded-lg cursor-pointer transition-colors ${selectedRoleIds.includes(role.id) ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}`}>
                 <input
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 rounded border-slate-200 focus:ring-blue-500"
