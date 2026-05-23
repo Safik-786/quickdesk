@@ -1,6 +1,7 @@
 
 import MetricsPanel from '../components/MetricsPanel';
 import { useMetricsSummary } from '../metrics.hooks';
+import PageHeader from '../../../components/ui/PageHeader';
 
 export default function MetricsPage() {
   const { data: metricsData, isLoading, isError, error } = useMetricsSummary();
@@ -8,10 +9,10 @@ export default function MetricsPage() {
   return (
     <div className="min-h-screen rounded-xl shadow bg-white">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">System Metrics</h1>
-          <p className="text-gray-500 mt-2">Overview of support ticket performance and statistics.</p>
-        </div>
+        <PageHeader 
+          title="System Metrics" 
+          description="Overview of support ticket performance and statistics." 
+        />
 
         {isLoading ? (
           <div className="flex items-center justify-center h-64">

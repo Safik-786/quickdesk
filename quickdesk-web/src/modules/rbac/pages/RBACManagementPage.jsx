@@ -3,6 +3,7 @@ import UserRoleTab from '../components/UserRoleTab';
 import RolePermissionTab from '../components/RolePermissionTab';
 import { useAuth } from '../../../context/AuthContext';
 import { ROLES } from '../../../constants/rbac';
+import PageHeader from '../../../components/ui/PageHeader';
 
 export default function RBACManagementPage() {
   const { user } = useAuth();
@@ -26,8 +27,11 @@ export default function RBACManagementPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h1 className="text-3xl font-bold text-gray-900">RBAC Management</h1>
-        <p className="text-gray-600 mt-2">Manage users, roles, and permissions</p>
+        <PageHeader 
+          title="RBAC Management" 
+          description="Manage users, roles, and permissions" 
+          className="mb-0"
+        />
       </div>
 
       {/* Tabs */}

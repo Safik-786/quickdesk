@@ -44,7 +44,7 @@ const Input = forwardRef(({
     ${isTextarea ? 'py-3' : 'py-2'}
     ${error
       ? 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500 placeholder-red-300'
-      : 'border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 bg-white'
+      : 'border-slate-200 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 bg-white'
     }
     disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
   `;

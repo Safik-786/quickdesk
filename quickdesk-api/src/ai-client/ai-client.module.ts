@@ -1,17 +1,9 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
 import { AiClientService } from './ai-client.service';
+import { RagService } from './rag.service';
 
 @Module({
-  imports: [
-    HttpModule.registerAsync({
-      useFactory: () => ({
-        baseURL: process.env.AI_SERVICE_URL || 'http://localhost:8000',
-        timeout: 30000,
-      }),
-    }),
-  ],
-  providers: [AiClientService],
+  providers: [AiClientService, RagService],
   exports: [AiClientService],
 })
 export class AiClientModule {}

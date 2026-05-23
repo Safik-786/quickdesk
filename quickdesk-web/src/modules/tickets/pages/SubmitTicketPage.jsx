@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSubmitTicket } from '../tickets.hooks';
 import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
+import PageHeader from '../../../components/ui/PageHeader';
 
 export default function SubmitTicketPage() {
   const navigate = useNavigate();
@@ -20,10 +21,10 @@ export default function SubmitTicketPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Submit a Ticket</h1>
-          <p className="text-gray-500 mt-2">Describe your issue and we'll get back to you shortly.</p>
-        </div>
+        <PageHeader 
+          title="Submit a Ticket" 
+          description="Describe your issue and we'll get back to you shortly." 
+        />
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">

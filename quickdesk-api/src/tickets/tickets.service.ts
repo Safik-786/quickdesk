@@ -25,7 +25,7 @@ export class TicketsService {
     private readonly gateway: TicketsGateway,
   ) {}
 
-  async create(dto: CreateTicketDto, employeeId: string) {
+  async create(dto: CreateTicketDto, employeeId: string, screenshots: string[] = []) {
     // Call AI service for classification
     const classification = await this.aiClient.classify({
       title: dto.title,
@@ -37,6 +37,7 @@ export class TicketsService {
         title: dto.title,
         description: dto.description,
         attachmentFilename: dto.attachmentFilename ?? null,
+        screenshots,
         employeeId,
         aiCategory: classification.category,
         aiPriority: classification.priority,
@@ -70,12 +71,39 @@ export class TicketsService {
     if (filters.search) {
       where.title = { contains: filters.search, mode: 'insensitive' };
     }
+    if (filters.date) {
+      const startDate = new Date(filters.date);
+      startDate.setUTCHours(0, 0, 0, 0);
+      const endDate = new Date(filters.date);
+      endDate.setUTCHours(23, 59, 59, 999);
+      where.createdAt = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
 
-    return this.prisma.ticket.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: { employee: { select: { id: true, name: true, email: true } } },
-    });
+    const page = Number(filters.page) || 1;
+    const limit = Number(filters.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.ticket.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: { employee: { select: { id: true, name: true, email: true } } },
+      }),
+      this.prisma.ticket.count({ where }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
   }
 
   async findOne(id: string) {

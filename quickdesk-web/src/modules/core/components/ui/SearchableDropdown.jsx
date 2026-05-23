@@ -17,7 +17,7 @@ export default function SearchableDropdown({
   const listboxRef = useRef(null);
 
   const filteredOptions = useMemo(() => {
-    return options.filter((opt) => 
+    return options.filter((opt) =>
       opt.label.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [options, searchTerm]);
@@ -50,7 +50,7 @@ export default function SearchableDropdown({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setActiveIndex((prev) => 
+        setActiveIndex((prev) =>
           prev < filteredOptions.length - 1 ? prev + 1 : prev
         );
         break;
@@ -98,7 +98,7 @@ export default function SearchableDropdown({
           {label}
         </label>
       )}
-      <div 
+      <div
         className="relative"
         onClick={() => {
           setIsOpen(true);
@@ -116,7 +116,7 @@ export default function SearchableDropdown({
           className={`
             w-full bg-white border rounded-lg pl-9 pr-10 py-2.5 text-sm
             focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors
-            ${error ? 'border-red-300 placeholder-red-300' : 'border-gray-300 placeholder-gray-400'}
+            ${error ? 'border-red-300 placeholder-red-300' : 'border-slate-200 placeholder-gray-400'}
           `}
           placeholder={selectedOption && !isOpen ? selectedOption.label : placeholder}
           value={isOpen ? searchTerm : ''}
@@ -138,7 +138,7 @@ export default function SearchableDropdown({
       </div>
 
       {isOpen && (
-        <div 
+        <div
           ref={listboxRef}
           className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-lg py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
         >

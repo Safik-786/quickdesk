@@ -9,21 +9,20 @@ const ShieldCheckbox = ({ checked, onChange, disabled }) => (
     type="button"
     disabled={disabled}
     onClick={() => onChange(!checked)}
-    className={`focus:outline-none transition-transform flex items-center justify-center w-8 h-8 rounded-full ${
-      disabled 
-        ? 'opacity-50 cursor-not-allowed' 
+    className={`focus:outline-none transition-transform flex items-center justify-center w-8 h-8 rounded-full ${disabled
+        ? 'opacity-50 cursor-not-allowed'
         : 'cursor-pointer hover:bg-gray-100 active:scale-90'
-    }`}
+      }`}
     title={checked ? "Granted" : "Denied"}
   >
-    <svg 
-      width="20" 
-      height="22" 
-      viewBox="0 0 24 24" 
-      fill={checked ? "#2563eb" : "none"} 
-      stroke={checked ? "#2563eb" : "#d1d5db"} 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <svg
+      width="20"
+      height="22"
+      viewBox="0 0 24 24"
+      fill={checked ? "#2563eb" : "none"}
+      stroke={checked ? "#2563eb" : "#d1d5db"}
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
       className="transition-colors duration-200"
     >
@@ -39,7 +38,7 @@ export default function RolePermissionTab() {
   const { data: roles = [], isLoading: isLoadingRoles } = useRoles();
   const { data: groupedPermissions = {}, isLoading: isLoadingPerms } = useGroupedPermissions();
   const { data: rolePermissions = [], isLoading: isLoadingRolePerms } = useRolePermissions(selectedRoleId);
-  
+
   const syncPermissions = useSyncPermissions();
   const [pendingPermissions, setPendingPermissions] = useState([]);
 
@@ -55,8 +54,8 @@ export default function RolePermissionTab() {
 
   const handleToggle = (permissionId, currentlyAssigned) => {
     if (!selectedRoleId) return;
-    setPendingPermissions(prev => 
-      currentlyAssigned 
+    setPendingPermissions(prev =>
+      currentlyAssigned
         ? prev.filter(id => id !== permissionId)
         : [...prev, permissionId]
     );
@@ -74,7 +73,7 @@ export default function RolePermissionTab() {
     return pendingPermissions.includes(permissionId);
   };
 
-  const hasUnsavedChanges = 
+  const hasUnsavedChanges =
     pendingPermissions.length !== rolePermissions.length ||
     !pendingPermissions.every(id => rolePermissions.some(rp => rp.id === id));
 
@@ -92,11 +91,10 @@ export default function RolePermissionTab() {
             <li key={role.id}>
               <button
                 onClick={() => setSelectedRoleId(role.id)}
-                className={`w-full text-left px-4 py-3 rounded-lg border transition-all duration-200 ${
-                  selectedRoleId === role.id
+                className={`w-full text-left px-4 py-3 rounded-lg border transition-all duration-200 ${selectedRoleId === role.id
                     ? 'bg-blue-50 border-blue-200 shadow-sm ring-1 ring-blue-500'
-                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                }`}
+                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-slate-200'
+                  }`}
               >
                 <div className={`font-medium ${selectedRoleId === role.id ? 'text-blue-700' : 'text-gray-900'}`}>
                   {role.name}
@@ -130,8 +128,8 @@ export default function RolePermissionTab() {
           </h3>
           <div className="flex items-center gap-3">
             {isLoadingRolePerms && <span className="text-sm text-gray-400">Loading...</span>}
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               isLoading={syncPermissions.isPending}
               isDisabled={!hasUnsavedChanges || isLoadingRolePerms}
             >
@@ -165,7 +163,7 @@ export default function RolePermissionTab() {
                       {ACTIONS.map(action => {
                         // Find if there's a permission ending in .ACTION (e.g., USER.CREATE)
                         const perm = permissions.find(p => p.code.toUpperCase().endsWith(`.${action}`));
-                        
+
                         return (
                           <td key={action} className="px-2 py-4 whitespace-nowrap text-center">
                             {perm ? (
@@ -189,14 +187,14 @@ export default function RolePermissionTab() {
             </table>
           </div>
         </div>
-        
+
         <div className="mt-4 flex items-center justify-end text-sm text-gray-500">
           <div className="flex items-center space-x-2 mr-4">
-            <ShieldCheckbox checked={true} onChange={() => {}} disabled={true} />
+            <ShieldCheckbox checked={true} onChange={() => { }} disabled={true} />
             <span>Granted</span>
           </div>
           <div className="flex items-center space-x-2">
-            <ShieldCheckbox checked={false} onChange={() => {}} disabled={true} />
+            <ShieldCheckbox checked={false} onChange={() => { }} disabled={true} />
             <span>Denied</span>
           </div>
         </div>

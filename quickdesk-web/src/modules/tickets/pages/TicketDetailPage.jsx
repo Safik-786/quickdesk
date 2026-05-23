@@ -8,6 +8,8 @@ import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
 import Dropdown from '../../core/components/ui/Dropdown';
 
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
+
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open' },
   { value: 'resolved', label: 'Resolved' },
@@ -24,6 +26,7 @@ export default function TicketDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [replyText, setReplyText] = useState('');
+  const [lightboxIdx, setLightboxIdx] = useState(null);
   
   const { data: ticket, isLoading, error } = useTicket(id);
   const { data: draft, refetch: getDraft, isFetching: isDraftLoading } = useTicketDraft(id);
@@ -34,6 +37,8 @@ export default function TicketDetailPage() {
   if (error) return <div className="p-8 text-red-600 text-center">Error loading ticket: {error.message}</div>;
   if (!ticket) return null;
 
+  const screenshots = ticket.screenshots || [];
+
   const handleReply = () => {
     if (!replyText.trim()) return;
     replyTicket(replyText, {
@@ -42,19 +47,19 @@ export default function TicketDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white rounded-xl shadow">
       <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate(-1)}
           iconLeft={backIcon}
-          className="mb-6 !px-0 text-indigo-600 hover:text-indigo-800 hover:bg-transparent"
+          className="mb-6 uppercase !px-0 text-indigo-800 hover:text-indigo-800 hover:bg-transparent"
         >
           Back to list
         </Button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* Ticket Header & Info */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
@@ -65,11 +70,96 @@ export default function TicketDetailPage() {
                 </span>
               </div>
               <p className="text-gray-700 whitespace-pre-wrap">{ticket.description}</p>
+
+              {/* Screenshots Gallery */}
+              {screenshots.length > 0 && (
+                <div className="mt-5">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Screenshots ({screenshots.length})
+                  </h4>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {screenshots.map((filename, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setLightboxIdx(idx)}
+                        className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-50 hover:ring-2 hover:ring-indigo-400 transition group"
+                      >
+                        <img
+                          src={`${API_BASE}/uploads/${filename}`}
+                          alt={`screenshot ${idx + 1}`}
+                          className="object-cover w-full h-full"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                          </svg>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-6 pt-6 border-t border-gray-100 flex justify-between text-sm text-gray-500">
                 <div>Reported by: <span className="font-medium text-gray-900">{ticket.customer?.name}</span></div>
                 <div>{new Date(ticket.createdAt).toLocaleString()}</div>
               </div>
             </div>
+
+            {/* Lightbox Modal */}
+            {lightboxIdx !== null && (
+              <div
+                className="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4"
+                onClick={() => setLightboxIdx(null)}
+              >
+                <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+                  <img
+                    src={`${API_BASE}/uploads/${screenshots[lightboxIdx]}`}
+                    alt={`screenshot ${lightboxIdx + 1}`}
+                    className="rounded-xl max-h-[80vh] w-full object-contain shadow-2xl"
+                  />
+                  {/* Close */}
+                  <button
+                    onClick={() => setLightboxIdx(null)}
+                    className="absolute -top-10 right-0 text-white hover:text-gray-300 transition"
+                  >
+                    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  {/* Prev */}
+                  {lightboxIdx > 0 && (
+                    <button
+                      onClick={() => setLightboxIdx(i => i - 1)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-white rounded-full p-2 transition"
+                    >
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  )}
+                  {/* Next */}
+                  {lightboxIdx < screenshots.length - 1 && (
+                    <button
+                      onClick={() => setLightboxIdx(i => i + 1)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-white rounded-full p-2 transition"
+                    >
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  )}
+                  {/* Counter */}
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black bg-opacity-50 text-white text-xs px-3 py-1 rounded-full">
+                    {lightboxIdx + 1} / {screenshots.length}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* AI Draft Section */}
             {draft?.replyDraft && (

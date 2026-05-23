@@ -94,6 +94,7 @@ model Ticket {
   title              String
   description        String
   attachmentFilename String?
+  screenshots        String[]
   status             TicketStatus @default(open)
 
   aiCategory    String?

@@ -17,7 +17,7 @@ langchain-huggingface==0.1.2
 sentence-transformers==3.3.1
 
 # Vector store
-faiss-cpu==1.9.0
+faiss-cpu==1.14.2
 
 # HTTP
 httpx==0.28.1

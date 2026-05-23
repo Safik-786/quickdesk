@@ -1,10 +1,9 @@
-import {
-  Injectable,
-  Logger,
-  ServiceUnavailableException,
-} from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { ChatOpenAI } from '@langchain/openai';
+import { PromptTemplate } from '@langchain/core/prompts';
+import { StructuredOutputParser } from '@langchain/core/output_parsers';
+import { z } from 'zod';
+import { RagService } from './rag.service';
 
 interface ClassifyInput {
   title: string;
@@ -29,35 +28,109 @@ export interface DraftReplyResult {
 @Injectable()
 export class AiClientService {
   private readonly logger = new Logger(AiClientService.name);
+  private llm: ChatOpenAI;
 
-  constructor(private readonly http: HttpService) {}
+  constructor(private readonly ragService: RagService) {
+    this.llm = new ChatOpenAI({
+      apiKey: process.env.XAI_API_KEY,
+      configuration: {
+        baseURL: 'https://api.x.ai/v1',
+      },
+      modelName: 'grok-beta',
+      temperature: 0.2,
+    });
+  }
 
   async classify(input: ClassifyInput): Promise<ClassifyResult> {
     try {
-      const response = await firstValueFrom(
-        this.http.post<ClassifyResult>('/classify', input),
+      const parser = StructuredOutputParser.fromZodSchema(
+        z.object({
+          category: z.enum(['IT', 'HR', 'Finance', 'Admin', 'Other']).describe('The department category'),
+          priority: z.enum(['Low', 'Medium', 'High']).describe('The priority level of the ticket'),
+        })
       );
-      return response.data;
+
+      const prompt = PromptTemplate.fromTemplate(`
+You are a helpdesk ticket classifier. Classify the following ticket into exactly one category and priority.
+
+Ticket Title: {title}
+Ticket Description: {description}
+
+{format_instructions}
+      `);
+
+      const chain = prompt.pipe(this.llm).pipe(parser);
+      const result = await chain.invoke({
+        title: input.title,
+        description: input.description,
+        format_instructions: parser.getFormatInstructions(),
+      });
+
+      return result as ClassifyResult;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('AI classify failed, using fallback', message);
-      // Graceful fallback — ticket still gets created
       return { category: 'Other', priority: 'Medium' };
     }
   }
 
   async draftReply(input: DraftReplyInput): Promise<DraftReplyResult> {
     try {
-      const response = await firstValueFrom(
-        this.http.post<DraftReplyResult>('/draft-reply', input),
-      );
-      return response.data;
+      const query = `${input.title}\n${input.description}`;
+      const relevantDocs = await this.ragService.retrieveRelevantDocs(query);
+      
+      const citations: string[] = [];
+      let context = '';
+
+      if (relevantDocs.length === 0) {
+        return {
+          draft: "I don't have specific guidance for this issue in our knowledge base. A support agent will review your ticket and respond shortly.",
+          citations: [],
+        };
+      }
+
+      for (const doc of relevantDocs) {
+        const source = doc.metadata.source || 'Unknown Source';
+        if (!citations.includes(source)) {
+          citations.push(source);
+        }
+        context += `\n[Source: ${source}]\n${doc.pageContent}\n`;
+      }
+
+      const prompt = PromptTemplate.fromTemplate(`
+You are a helpful IT support agent at a company. Use the following knowledge base articles to draft a professional reply to the employee's support ticket.
+
+IMPORTANT RULES:
+- Base your reply ONLY on the provided knowledge base articles.
+- Do not make up information not present in the articles.
+- Be concise, friendly, and actionable.
+
+Knowledge Base Articles:
+{context}
+
+---
+Employee Ticket:
+Title: {title}
+Description: {description}
+
+Draft Reply:
+      `);
+
+      const chain = prompt.pipe(this.llm);
+      const response = await chain.invoke({
+        context,
+        title: input.title,
+        description: input.description,
+      });
+
+      return {
+        draft: response.content.toString().trim(),
+        citations,
+      };
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('AI draft-reply failed', message);
-      throw new ServiceUnavailableException(
-        'AI service is currently unavailable',
-      );
+      throw new ServiceUnavailableException('AI service is currently unavailable');
     }
   }
 }

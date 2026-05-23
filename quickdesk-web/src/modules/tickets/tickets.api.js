@@ -2,7 +2,10 @@ import { axiosInstance } from '../../lib/axios';
 
 export const ticketsApi = {
   // Employee
-  submit: (data) => axiosInstance.post('/tickets', data),
+  submit: (data) =>
+    axiosInstance.post('/tickets', data, {
+      headers: { 'Content-Type': undefined }, // let axios set multipart/form-data + boundary from FormData
+    }),
   getMyTickets: () => axiosInstance.get('/tickets/mine'),
 
   // Agent

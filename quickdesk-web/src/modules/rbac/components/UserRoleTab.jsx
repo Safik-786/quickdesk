@@ -42,7 +42,7 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
   };
 
   const toggleRole = (roleId) => {
-    setSelectedRoleIds(prev => 
+    setSelectedRoleIds(prev =>
       prev.includes(roleId) ? prev.filter(id => id !== roleId) : [...prev, roleId]
     );
   };
@@ -100,18 +100,16 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
           <button
             type="button"
             onClick={() => setIsVerified(!isVerified)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              isVerified ? 'bg-blue-600' : 'bg-gray-200'
-            }`}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isVerified ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
             role="switch"
             aria-checked={isVerified}
           >
             <span className="sr-only">Toggle verification</span>
             <span
               aria-hidden="true"
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                isVerified ? 'translate-x-5' : 'translate-x-0'
-              }`}
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isVerified ? 'translate-x-5' : 'translate-x-0'
+                }`}
             />
           </button>
         </div>
@@ -123,7 +121,7 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
               <label key={role.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                  className="h-4 w-4 text-blue-600 rounded border-slate-200 focus:ring-blue-500"
                   checked={selectedRoleIds.includes(role.id)}
                   onChange={() => toggleRole(role.id)}
                 />
@@ -190,18 +188,16 @@ export default function UserRoleTab() {
                   <button
                     onClick={() => handleToggleVerify(user.id, user.isVerified)}
                     disabled={toggleVerification.isPending}
-                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      user.isVerified ? 'bg-blue-600' : 'bg-gray-200'
-                    } disabled:opacity-50`}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${user.isVerified ? 'bg-blue-600' : 'bg-gray-200'
+                      } disabled:opacity-50`}
                     role="switch"
                     aria-checked={user.isVerified}
                   >
                     <span className="sr-only">Toggle verification</span>
                     <span
                       aria-hidden="true"
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                        user.isVerified ? 'translate-x-4' : 'translate-x-0'
-                      }`}
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${user.isVerified ? 'translate-x-4' : 'translate-x-0'
+                        }`}
                     />
                   </button>
                   <span className={`ml-2 text-xs font-medium ${user.isVerified ? 'text-blue-700' : 'text-gray-500'}`}>
@@ -221,7 +217,7 @@ export default function UserRoleTab() {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button 
+                  <button
                     onClick={() => openSlideover(user)}
                     className="text-indigo-600 hover:text-indigo-900"
                   >

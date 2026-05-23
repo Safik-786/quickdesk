@@ -7,7 +7,14 @@ import {
   Param,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+  BadRequestException,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { TicketsService } from './tickets.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -27,8 +34,33 @@ export class TicketsController {
   // Employee: submit a ticket
   @Post()
   @Roles('employee')
-  create(@Body() dto: CreateTicketDto, @CurrentUser() user: JwtUser) {
-    return this.ticketsService.create(dto, user.id);
+  @UseInterceptors(
+    FilesInterceptor('screenshots', 5, {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = uuidv4() + extname(file.originalname);
+          cb(null, uniqueSuffix);
+        },
+      }),
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return cb(new BadRequestException('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  create(
+    @Body() dto: CreateTicketDto,
+    @CurrentUser() user: JwtUser,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    const filenames = files?.map((f) => f.filename) || [];
+    return this.ticketsService.create(dto, user.id, filenames);
   }
 
   // Employee: view own tickets

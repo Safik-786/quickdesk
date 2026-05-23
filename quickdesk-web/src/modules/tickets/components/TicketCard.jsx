@@ -1,33 +1,67 @@
 
 import { Link } from 'react-router-dom';
 
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
+
+const statusColors = {
+  open: 'bg-amber-100 text-amber-800 border-amber-200',
+  resolved: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  closed: 'bg-gray-100 text-gray-800 border-gray-200',
+};
+
 export default function TicketCard({ ticket }) {
-  const statusColors = {
-    open: 'bg-amber-100 text-amber-800 border-amber-200',
-    resolved: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    closed: 'bg-gray-100 text-gray-800 border-gray-200',
-  };
+  const screenshots = ticket.screenshots || [];
+  const visibleScreenshots = screenshots.slice(0, 3);
+  const overflow = screenshots.length - visibleScreenshots.length;
 
   return (
     <Link to={`/tickets/${ticket.id || ticket._id}`} className="block">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">{ticket.title}</h3>
-          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[ticket.status] || statusColors.open}`}>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col gap-3">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 flex-1 mr-3">{ticket.title}</h3>
+          <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[ticket.status] || statusColors.open}`}>
             {ticket.status?.charAt(0).toUpperCase() + ticket.status?.slice(1)}
           </span>
         </div>
-        <p className="text-sm text-gray-600 line-clamp-2 mb-4">{ticket.description}</p>
+
+        {/* Description */}
+        <p className="text-sm text-gray-600 line-clamp-2">{ticket.description}</p>
+
+        {/* Screenshots strip */}
+        {visibleScreenshots.length > 0 && (
+          <div className="flex items-center gap-2">
+            {visibleScreenshots.map((filename, idx) => (
+              <div
+                key={idx}
+                className="relative w-16 h-12 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shrink-0"
+              >
+                <img
+                  src={`${API_BASE}/uploads/${filename}`}
+                  alt={`screenshot ${idx + 1}`}
+                  className="object-cover w-full h-full"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+            ))}
+            {overflow > 0 && (
+              <div className="w-16 h-12 rounded-lg border border-gray-200 bg-gray-100 flex items-center justify-center shrink-0">
+                <span className="text-xs font-semibold text-gray-500">+{overflow}</span>
+              </div>
+            )}
+            <span className="text-xs text-gray-400 ml-1">{screenshots.length} screenshot{screenshots.length !== 1 ? 's' : ''}</span>
+          </div>
+        )}
+
+        {/* Footer */}
         <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 pt-3">
-          <div className="flex items-center">
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             {ticket.customer?.name || 'Customer'}
           </div>
-          <div>
-            {new Date(ticket.createdAt).toLocaleDateString()}
-          </div>
+          <div>{new Date(ticket.createdAt).toLocaleDateString()}</div>
         </div>
       </div>
     </Link>
