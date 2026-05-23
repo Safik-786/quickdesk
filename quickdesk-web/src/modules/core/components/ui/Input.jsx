@@ -41,7 +41,7 @@ const Input = forwardRef(({
     focus:outline-none focus:ring-1 focus:ring-opacity-50
     ${iconLeft && !isTextarea ? 'pl-10' : 'pl-3.5'}
     ${effectiveIconRight && !isTextarea ? 'pr-10' : 'pr-3.5'}
-    ${isTextarea ? 'py-3' : 'py-2.5'}
+    ${isTextarea ? 'py-3' : 'py-2'}
     ${error
       ? 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500 placeholder-red-300'
       : 'border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 bg-white'

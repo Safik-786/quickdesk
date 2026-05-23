@@ -35,6 +35,18 @@ export function useAssignRoles() {
   });
 }
 
+export function useToggleVerification() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, isVerified }) => {
+      return await api.patch(`/users/${userId}/verify`, { isVerified });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+}
+
 // Roles
 export function useRoles() {
   return useQuery({

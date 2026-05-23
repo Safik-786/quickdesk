@@ -45,7 +45,7 @@ export default function Header() {
           </svg>
         </button>
         {/* Breadcrumbs or Page Title could go here */}
-        <h2 className="text-lg font-semibold text-gray-800 hidden sm:block">Welcome back</h2>
+        <h2 className="text-lg font-semibold text-gray-800 hidden sm:block">Welcome back <span>{user?.name} </span> </h2>
       </div>
 
       <div className="flex items-center space-x-4">

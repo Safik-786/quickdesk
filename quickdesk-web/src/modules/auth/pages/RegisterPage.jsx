@@ -4,6 +4,7 @@ import { useRegister } from '../auth.hooks';
 import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
 import toast from 'react-hot-toast';
+import AuthLayout from '../components/AuthLayout';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -17,29 +18,26 @@ export default function RegisterPage() {
       toast.error('Passwords do not match');
       return;
     }
-    register(form, {
+
+    const { confirmPassword, ...registerPayload } = form;
+
+    register(registerPayload, {
       onSuccess: () => {
-        toast.success('Account created successfully');
-        navigate('/my-tickets', { replace: true });
+        toast.success('Account created successfully. Please sign in.');
+        navigate('/login', { replace: true });
       },
     });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-600 rounded-xl mb-4">
-            <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
-          <p className="text-sm text-gray-500 mt-1">Join QuickDesk today</p>
+    <AuthLayout>
+      <div className="w-full h-full overflow-auto px-1">
+        <div className="text-start mb-6">
+          <h1 className="text-xl uppercase font-bold text-gray-900 tracking-tight">Create account</h1>
+          <p className="text-xs text-gray-500 mt-2">Join QuickDesk today and level up your team.</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="bg-white">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
@@ -93,6 +91,6 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

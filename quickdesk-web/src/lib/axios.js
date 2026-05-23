@@ -53,8 +53,10 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem('qd_user');
-        window.location.href = '/login';
+        // Only redirect to login if not already on an auth page to prevent infinite reload loops
+        if (!['/login', '/register'].includes(window.location.pathname)) {
+          window.location.href = '/login';
+        }
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

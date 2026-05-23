@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   Query,
@@ -57,6 +58,7 @@ export class UsersController {
       dto.email,
       dto.password,
       dto.name,
+      dto.isVerified,
     );
 
     // Assign roles if provided
@@ -79,5 +81,18 @@ export class UsersController {
     @CurrentUser() actor: JwtUser,
   ) {
     return this.usersService.assignRoles(userId, dto.roleIds, actor.id);
+  }
+
+  /**
+   * Toggle user verification status
+   * Requires: RBAC.MANAGE permission
+   */
+  @Patch(':id/verify')
+  @RequirePermissions('RBAC.MANAGE')
+  async toggleVerification(
+    @Param('id') userId: string,
+    @Body('isVerified') isVerified: boolean,
+  ) {
+    return this.usersService.toggleVerification(userId, isVerified);
   }
 }

@@ -78,6 +78,7 @@ model User {
   name         String
   passwordHash       String
   hashedRefreshToken String?
+  isVerified   Boolean     @default(false)
 
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt

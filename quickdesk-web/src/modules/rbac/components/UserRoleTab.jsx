@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUsers, useRoles, useCreateUser, useAssignRoles } from '../rbac.hooks';
+import { useUsers, useRoles, useCreateUser, useAssignRoles, useToggleVerification } from '../rbac.hooks';
 import Button from '../../core/components/ui/Button';
 import Slideover from '../../core/components/ui/Slideover';
 import Input from '../../core/components/ui/Input';
@@ -8,28 +8,35 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
   const { data: roles } = useRoles();
   const createUser = useCreateUser();
   const assignRoles = useAssignRoles();
+  const toggleVerification = useToggleVerification();
 
-  const [form, setForm] = useState({ email: '', name: '', password: '' });
+  const [form, setForm] = useState({ email: '', name: '', password: '', isVerified: true });
   const [selectedRoleIds, setSelectedRoleIds] = useState([]);
+  const [isVerified, setIsVerified] = useState(true);
 
   // Setup form when opened
   useState(() => {
     if (selectedUser) {
       setSelectedRoleIds(selectedUser.userRoles.map(ur => ur.roleId));
+      setIsVerified(selectedUser.isVerified);
     } else {
-      setForm({ email: '', name: '', password: '' });
+      setForm({ email: '', name: '', password: '', isVerified: true });
       setSelectedRoleIds([]);
+      setIsVerified(true);
     }
   }, [isOpen, selectedUser]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (selectedUser) {
-      // Edit mode - just assigning roles
+      // Edit mode - assign roles and update verification if changed
       await assignRoles.mutateAsync({ userId: selectedUser.id, roleIds: selectedRoleIds });
+      if (selectedUser.isVerified !== isVerified) {
+        await toggleVerification.mutateAsync({ userId: selectedUser.id, isVerified });
+      }
     } else {
       // Create mode
-      await createUser.mutateAsync({ ...form, roleIds: selectedRoleIds });
+      await createUser.mutateAsync({ ...form, roleIds: selectedRoleIds, isVerified });
     }
     onClose();
   };
@@ -85,6 +92,30 @@ function UserSlideover({ isOpen, onClose, selectedUser }) {
           </div>
         )}
 
+        <div className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+          <div>
+            <h3 className="text-sm font-medium text-gray-900">Active Status</h3>
+            <p className="text-xs text-gray-500">Allow this user to log in</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsVerified(!isVerified)}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isVerified ? 'bg-blue-600' : 'bg-gray-200'
+            }`}
+            role="switch"
+            aria-checked={isVerified}
+          >
+            <span className="sr-only">Toggle verification</span>
+            <span
+              aria-hidden="true"
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                isVerified ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
+
         <div>
           <h3 className="text-sm font-medium text-gray-900 mb-3">Assign Roles</h3>
           <div className="space-y-2">
@@ -115,6 +146,11 @@ export default function UserRoleTab() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const { data, isLoading } = useUsers(page, 10);
+  const toggleVerification = useToggleVerification();
+
+  const handleToggleVerify = async (userId, currentStatus) => {
+    await toggleVerification.mutateAsync({ userId, isVerified: !currentStatus });
+  };
 
   const openSlideover = (user = null) => {
     setSelectedUser(user);
@@ -138,6 +174,7 @@ export default function UserRoleTab() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -148,6 +185,28 @@ export default function UserRoleTab() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{user.name}</div>
                   <div className="text-sm text-gray-500">{user.email}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => handleToggleVerify(user.id, user.isVerified)}
+                    disabled={toggleVerification.isPending}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                      user.isVerified ? 'bg-blue-600' : 'bg-gray-200'
+                    } disabled:opacity-50`}
+                    role="switch"
+                    aria-checked={user.isVerified}
+                  >
+                    <span className="sr-only">Toggle verification</span>
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        user.isVerified ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                  <span className={`ml-2 text-xs font-medium ${user.isVerified ? 'text-blue-700' : 'text-gray-500'}`}>
+                    {user.isVerified ? 'Verified' : 'Pending'}
+                  </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2">

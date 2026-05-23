@@ -16,7 +16,7 @@ export class UsersService {
     return this.prisma.user.create({ data });
   }
 
-  async createWithPassword(email: string, password: string, name?: string) {
+  async createWithPassword(email: string, password: string, name?: string, isVerified?: boolean) {
     // Check if user exists
     const existing = await this.findByEmail(email);
     if (existing) {
@@ -31,6 +31,7 @@ export class UsersService {
         email,
         name: name || email.split('@')[0],
         passwordHash,
+        isVerified: isVerified ?? true, // Auto-verify when created by admin unless explicitly false
       },
       include: {
         userRoles: {
@@ -152,5 +153,21 @@ export class UsersService {
     ]);
 
     return this.findById(userId);
+  }
+
+  async toggleVerification(userId: string, isVerified: boolean) {
+    const user = await this.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { isVerified },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isVerified: true,
+      },
+    });
   }
 }

@@ -147,31 +147,34 @@ async function main() {
 
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@quickdesk.com' },
-    update: {},
+    update: { isVerified: true },
     create: {
       email: 'admin@quickdesk.com',
       name: 'System Admin',
       passwordHash: adminHash,
+      isVerified: true,
     },
   });
 
   const agentUser = await prisma.user.upsert({
     where: { email: 'agent@quickdesk.com' },
-    update: {},
+    update: { isVerified: true },
     create: {
       email: 'agent@quickdesk.com',
       name: 'Support Agent',
       passwordHash: agentHash,
+      isVerified: true,
     },
   });
 
   const employeeUser = await prisma.user.upsert({
     where: { email: 'employee@quickdesk.com' },
-    update: {},
+    update: { isVerified: true },
     create: {
       email: 'employee@quickdesk.com',
       name: 'Jane Employee',
       passwordHash: employeeHash,
+      isVerified: true,
     },
   });
 

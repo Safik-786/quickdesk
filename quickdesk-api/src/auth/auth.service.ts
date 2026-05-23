@@ -44,7 +44,7 @@ export class AuthService {
       });
     }
 
-    return await this.signToken(user.id, user.email);
+    return await this.signToken(user.id, user.email, user.name);
   }
 
   async login(dto: LoginDto) {
@@ -54,7 +54,11 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
 
-    return await this.signToken(user.id, user.email);
+    if (!user.isVerified) {
+      throw new UnauthorizedException('Account awaiting admin verification');
+    }
+
+    return await this.signToken(user.id, user.email, user.name);
   }
 
   async refresh(refreshToken: string) {
@@ -71,14 +75,20 @@ export class AuthService {
       const valid = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
       if (!valid) throw new UnauthorizedException('Invalid refresh token');
 
-      return await this.signToken(user.id, user.email);
+      return await this.signToken(user.id, user.email, user.name);
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  private async signToken(userId: string, email: string) {
-    const payload = { sub: userId, email };
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('User not found');
+    return this.buildUserProfile(user.id, user.email, user.name);
+  }
+
+  private async signToken(userId: string, email: string, name: string) {
+    const payload = { sub: userId, email, name };
     
     // Generate tokens
     const access_token = this.jwtService.sign(payload);
@@ -91,6 +101,16 @@ export class AuthService {
     const hashedRefreshToken = await bcrypt.hash(refresh_token, 10);
     await this.usersService.update(userId, { hashedRefreshToken });
 
+    const user = await this.buildUserProfile(userId, email, name);
+
+    return {
+      access_token,
+      refresh_token,
+      user,
+    };
+  }
+
+  private async buildUserProfile(userId: string, email: string, name: string) {
     // Fetch Roles Metadata
     let roles: any[] = [];
     const userRoles = await this.prisma.userRole.findMany({
@@ -112,10 +132,6 @@ export class AuthService {
       permissions = Array.from(permSet);
     }
 
-    return {
-      access_token,
-      refresh_token,
-      user: { id: userId, email, roles, permissions },
-    };
+    return { id: userId, email, name, roles, permissions };
   }
 }

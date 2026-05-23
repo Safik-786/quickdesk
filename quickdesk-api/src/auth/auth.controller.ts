@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Res, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, Res, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +50,13 @@ export class AuthController {
     const result = await this.authService.refresh(refreshToken);
     this.setCookies(res, result.access_token, result.refresh_token);
     return { user: result.user };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getMe(@Req() req: any) {
+    const user = await this.authService.getMe(req.user.id);
+    return { user };
   }
 
   @Post('logout')

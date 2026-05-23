@@ -14,12 +14,7 @@ export function useLogin() {
 }
 
 export function useRegister() {
-  const { login } = useAuth();
-
   return useMutation({
     mutationFn: authApi.register,
-    onSuccess: (data) => {
-      login(data.user);
-    },
   });
 }

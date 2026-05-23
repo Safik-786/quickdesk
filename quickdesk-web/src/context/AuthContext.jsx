@@ -25,14 +25,19 @@ function authReducer(state, action) {
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Rehydrate from localStorage on mount
+  // Fetch /auth/me on mount to get freshest user state
   useEffect(() => {
-    const user = localStorage.getItem('qd_user');
-    if (user) {
-      dispatch({ type: 'LOGIN', user: JSON.parse(user) });
-    } else {
-      dispatch({ type: 'LOADED' });
-    }
+    const initAuth = async () => {
+      try {
+        const res = await axiosInstance.get('/auth/me');
+        const user = res.user;
+        dispatch({ type: 'LOGIN', user });
+      } catch (err) {
+        // If unauthorized or network error, clear state
+        dispatch({ type: 'LOGOUT' });
+      }
+    };
+    initAuth();
   }, []);
 
   // Log user state changes for debugging
@@ -43,7 +48,6 @@ export function AuthProvider({ children }) {
   }, [state.user]);
 
   const login = (user) => {
-    localStorage.setItem('qd_user', JSON.stringify(user));
     dispatch({ type: 'LOGIN', user });
   };
 
@@ -53,7 +57,6 @@ export function AuthProvider({ children }) {
     } catch (e) {
       // Ignore errors on logout
     }
-    localStorage.removeItem('qd_user');
     dispatch({ type: 'LOGOUT' });
   };
 
