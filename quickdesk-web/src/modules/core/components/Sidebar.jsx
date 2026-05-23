@@ -100,11 +100,11 @@ export default function Sidebar() {
         ))}
       </nav>
       
-      <div className="p-2 border-t border-gray-800">
-        <div className={`flex items-center p-3 bg-gray-800 rounded-xl ${isCollapsed ? 'justify-center' : ''}`}>
-          <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
-          {!isCollapsed && (
-            <span className="text-xs font-medium text-gray-300">System Online</span>
+      <div className="p-2 border-t border-slate-200">
+        <div className={`flex items-center p-3 bg-slate-50 shadow-inner rounded-xl ${isCollapsed ? 'justify-center' : ''}`}>
+          <div className="w-2 h-2 flex-shrink-0 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+          {(
+            <span className="text-xs font-medium text-gray-800">{isCollapsed ? "Online" : " System Online"}</span>
           )}
         </div>
       </div>

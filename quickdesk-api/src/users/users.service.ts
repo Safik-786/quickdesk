@@ -71,23 +71,36 @@ export class UsersService {
     });
   }
 
-  async findAll() {
-    return this.prisma.user.findMany({
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              select: {
-                id: true,
-                name: true,
-                code: true,
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, count] = await Promise.all([
+      this.prisma.user.findMany({
+        skip,
+        take: limit,
+        include: {
+          userRoles: {
+            include: {
+              role: {
+                select: {
+                  id: true,
+                  name: true,
+                  code: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count(),
+    ]);
+
+    return {
+      data,
+      count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    };
   }
 
   async update(id: string, data: any) {

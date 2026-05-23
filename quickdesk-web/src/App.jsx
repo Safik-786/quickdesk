@@ -12,6 +12,7 @@ import TicketDetailPage from './modules/tickets/pages/TicketDetailPage';
 import MetricsPage from './modules/metrics/pages/MetricsPage';
 import RBACManagementPage from './modules/rbac/pages/RBACManagementPage';
 import { ROLES } from './constants/rbac';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   return (
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </BrowserRouter>
+        <Toaster position="top-right" />
       </SocketProvider>
     </AuthProvider>
   );

@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
 
 const variantClasses = {
-  primary: 'bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-sm',
-  secondary: 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 shadow-sm',
+  primary: 'bg-white hover:bg-blue-50 text-blue-800 border-transparent shadow-sm',
+  secondary: 'bg-white hover:bg-gray-50 text-gray-700  shadow',
   danger: 'bg-red-600 hover:bg-red-700 text-white border-transparent shadow-sm',
   ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent',
 };
@@ -31,7 +31,7 @@ const Button = forwardRef(({
       ref={ref}
       disabled={isDisabled}
       className={`
-        inline-flex items-center justify-center font-medium rounded-lg transition-colors border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+        inline-flex items-center active:scale-98 hover:scale-102 justify-center font-medium rounded-lg transition-all duration-300 
         ${variantClasses[variant]}
         ${sizeClasses[size]}
         ${isDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}

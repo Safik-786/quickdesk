@@ -72,7 +72,7 @@ export default function Slideover({
             className="relative z-10 w-screen md:w-[40vw] flex h-full flex-col bg-white shadow-2xl pointer-events-auto border-l border-gray-200"
           >
               {/* Header */}
-              <div className="px-6 py-6 border-b border-gray-100 flex items-center justify-between bg-white z-10">
+              <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between bg-white z-10">
                 <div className="flex items-center space-x-3">
                   {/* Logo Icon */}
                   <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
@@ -100,7 +100,7 @@ export default function Slideover({
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 backdrop-blur flex justify-end gap-3 z-10">
+              <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/80 backdrop-blur flex justify-end gap-3 z-10">
                 {secondaryBtnText && (
                   <Button
                     type="button"

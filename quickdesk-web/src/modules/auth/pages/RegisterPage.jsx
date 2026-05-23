@@ -3,20 +3,24 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useRegister } from '../auth.hooks';
 import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
-import Dropdown from '../../core/components/ui/Dropdown';
+import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'employee' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
 
   const { mutate: register, isPending, error } = useRegister();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
     register(form, {
-      onSuccess: (data) => {
-        const dest = data.user.legacyRole === 'employee' ? '/my-tickets' : '/dashboard';
-        navigate(dest, { replace: true });
+      onSuccess: () => {
+        toast.success('Account created successfully');
+        navigate('/my-tickets', { replace: true });
       },
     });
   };
@@ -67,14 +71,12 @@ export default function RegisterPage() {
               placeholder="Min. 6 characters"
             />
 
-            <Dropdown
-              label="Account type"
-              value={form.role}
-              onChange={(val) => setForm({ ...form, role: val })}
-              options={[
-                { value: 'employee', label: 'Employee' },
-                { value: 'agent', label: 'Support Agent' }
-              ]}
+            <Input
+              label="Confirm Password"
+              type="password" required minLength={6}
+              value={form.confirmPassword}
+              onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+              placeholder="Confirm password"
             />
 
             <Button

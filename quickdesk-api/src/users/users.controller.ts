@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -26,12 +27,13 @@ export class UsersController {
    */
   @Get()
   @RequirePermissions('RBAC.READ')
-  async getAllUsers() {
-    const users = await this.usersService.findAll();
-    return {
-      data: users,
-      count: users.length,
-    };
+  async getAllUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    return this.usersService.findAll(pageNum, limitNum);
   }
 
   /**
