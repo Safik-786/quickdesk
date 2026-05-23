@@ -15,8 +15,8 @@ export default function TicketCard({ ticket }) {
   const overflow = screenshots.length - visibleScreenshots.length;
 
   return (
-    <Link to={`/tickets/${ticket.id || ticket._id}`} className="block">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col gap-3">
+    <Link to={`/tickets/${ticket.id || ticket._id}`} className="block h-full">
+      <div className="bg-white h-full rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col gap-3">
         {/* Header */}
         <div className="flex justify-between items-start">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 flex-1 mr-3">{ticket.title}</h3>
@@ -26,7 +26,9 @@ export default function TicketCard({ ticket }) {
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 line-clamp-2">{ticket.description}</p>
+        <div className="flex-1">
+          <p className="text-sm text-gray-600 line-clamp-3">{ticket.description}</p>
+        </div>
 
         {/* Screenshots strip */}
         {visibleScreenshots.length > 0 && (
@@ -39,7 +41,7 @@ export default function TicketCard({ ticket }) {
                 <img
                   src={`${API_BASE}/uploads/${filename}`}
                   alt={`screenshot ${idx + 1}`}
-                  className="object-cover w-full h-full"
+                  className="object-contain w-full h-full bg-white p-0.5"
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
               </div>

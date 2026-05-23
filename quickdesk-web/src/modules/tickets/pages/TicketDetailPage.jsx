@@ -90,7 +90,7 @@ export default function TicketDetailPage() {
                         <img
                           src={`${API_BASE}/uploads/${filename}`}
                           alt={`screenshot ${idx + 1}`}
-                          className="object-cover w-full h-full"
+                          className="object-contain w-full h-full bg-white"
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center">
@@ -113,21 +113,25 @@ export default function TicketDetailPage() {
             {/* Lightbox Modal */}
             {lightboxIdx !== null && (
               <div
-                className="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4"
+                className="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
                 onClick={() => setLightboxIdx(null)}
               >
-                <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
-                  <img
-                    src={`${API_BASE}/uploads/${screenshots[lightboxIdx]}`}
-                    alt={`screenshot ${lightboxIdx + 1}`}
-                    className="rounded-xl max-h-[80vh] w-full object-contain shadow-2xl"
-                  />
+                <div className="relative max-w-5xl w-full flex justify-center" onClick={(e) => e.stopPropagation()}>
+                  <div className="relative rounded-xl overflow-hidden shadow-2xl bg-white/5 ring-1 ring-white/10">
+                    {/* Add a subtle checkerboard pattern for transparent images */}
+                    <div className="absolute inset-0" style={{ backgroundImage: 'conic-gradient(rgba(255,255,255,0.1) 90deg, transparent 90deg, transparent 180deg, rgba(255,255,255,0.1) 180deg, rgba(255,255,255,0.1) 270deg, transparent 270deg)', backgroundSize: '20px 20px', opacity: 0.5, zIndex: -1 }}></div>
+                    <img
+                      src={`${API_BASE}/uploads/${screenshots[lightboxIdx]}`}
+                      alt={`screenshot ${lightboxIdx + 1}`}
+                      className="max-h-[85vh] w-auto max-w-full object-contain"
+                    />
+                  </div>
                   {/* Close */}
                   <button
                     onClick={() => setLightboxIdx(null)}
-                    className="absolute -top-10 right-0 text-white hover:text-gray-300 transition"
+                    className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors p-2"
                   >
-                    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -135,10 +139,10 @@ export default function TicketDetailPage() {
                   {lightboxIdx > 0 && (
                     <button
                       onClick={() => setLightboxIdx(i => i - 1)}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-white rounded-full p-2 transition"
+                      className="absolute -left-16 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-2"
                     >
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                   )}
@@ -146,15 +150,15 @@ export default function TicketDetailPage() {
                   {lightboxIdx < screenshots.length - 1 && (
                     <button
                       onClick={() => setLightboxIdx(i => i + 1)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-white rounded-full p-2 transition"
+                      className="absolute -right-16 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-2"
                     >
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
                   )}
                   {/* Counter */}
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black bg-opacity-50 text-white text-xs px-3 py-1 rounded-full">
+                  <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/70 text-sm font-medium tracking-wide">
                     {lightboxIdx + 1} / {screenshots.length}
                   </div>
                 </div>
