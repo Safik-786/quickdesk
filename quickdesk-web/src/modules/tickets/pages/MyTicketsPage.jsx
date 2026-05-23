@@ -1,8 +1,8 @@
-
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useMyTickets } from '../tickets.hooks';
 import TicketCard from '../components/TicketCard';
 import Button from '../../core/components/ui/Button';
+import SubmitTicketSlideover from '../components/SubmitTicketSlideover';
 
 const plusIcon = (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -11,18 +11,18 @@ const plusIcon = (
 );
 
 export default function MyTicketsPage() {
-  const navigate = useNavigate();
+  const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const { data: tickets, isLoading, error } = useMyTickets();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white rounded-xl shadow">
       <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Tickets</h1>
             <p className="text-gray-500 mt-2">Track the status of your reported issues.</p>
           </div>
-          <Button iconLeft={plusIcon} onClick={() => navigate('/submit')}>
+          <Button iconLeft={plusIcon} onClick={() => setIsSubmitOpen(true)}>
             New Ticket
           </Button>
         </div>
@@ -36,7 +36,7 @@ export default function MyTicketsPage() {
             {error.message}
           </div>
         ) : tickets?.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
+          <div className="text-center mx-20 py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -50,6 +50,11 @@ export default function MyTicketsPage() {
             ))}
           </div>
         )}
+
+        <SubmitTicketSlideover 
+          isOpen={isSubmitOpen} 
+          onClose={() => setIsSubmitOpen(false)} 
+        />
       </main>
     </div>
   );

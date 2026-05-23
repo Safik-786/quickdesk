@@ -6,7 +6,6 @@ import DashboardLayout from './modules/core/components/DashboardLayout';
 
 import LoginPage from './modules/auth/pages/LoginPage';
 import RegisterPage from './modules/auth/pages/RegisterPage';
-import SubmitTicketPage from './modules/tickets/pages/SubmitTicketPage';
 import MyTicketsPage from './modules/tickets/pages/MyTicketsPage';
 import DashboardPage from './modules/tickets/pages/DashboardPage';
 import TicketDetailPage from './modules/tickets/pages/TicketDetailPage';
@@ -28,14 +27,7 @@ export default function App() {
             {/* Authenticated Layout */}
             <Route element={<DashboardLayout />}>
               {/* Employee routes */}
-              <Route
-                path="/submit"
-                element={
-                  <ProtectedRoute role={ROLES.EMPLOYEE}>
-                    <SubmitTicketPage />
-                  </ProtectedRoute>
-                }
-              />
+
               <Route
                 path="/my-tickets"
                 element={
