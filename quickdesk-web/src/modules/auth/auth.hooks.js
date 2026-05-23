@@ -8,7 +8,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
-      login(data.access_token, data.user);
+      login(data.user);
     },
   });
 }
@@ -19,7 +19,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: authApi.register,
     onSuccess: (data) => {
-      login(data.access_token, data.user);
+      login(data.user);
     },
   });
 }

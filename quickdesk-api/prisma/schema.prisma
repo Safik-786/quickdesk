@@ -81,10 +81,11 @@ model User {
   id           String      @id @default(cuid())
   email        String      @unique
   name         String
-  passwordHash String
-  legacyRole   LegacyRole  @default(employee)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  passwordHash       String
+  hashedRefreshToken String?
+  legacyRole         LegacyRole  @default(employee)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 
   tickets      Ticket[]    @relation("EmployeeTickets")
   resolved     Ticket[]    @relation("ResolvedByAgent")

@@ -1,42 +1,69 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
+  withCredentials: true,
 });
 
-// ── Request interceptor: attach JWT ──────────────────────────────────────────
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('qd_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
+// Flag to prevent multiple simultaneous refresh requests
+let isRefreshing = false;
+let failedQueue = [];
 
-// ── Response interceptor: normalize errors ───────────────────────────────────
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 axiosInstance.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
     const status = error.response?.status;
+    
+    // Auto-refresh on 401 (if it's not a retry and not the refresh endpoint itself)
+    if (status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh') {
+      if (isRefreshing) {
+        return new Promise(function(resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        }).then(() => {
+          return axiosInstance(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        await axiosInstance.post('/auth/refresh');
+        processQueue(null);
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        processQueue(err, null);
+        localStorage.removeItem('qd_user');
+        window.location.href = '/login';
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
       error.message ||
       'An unexpected error occurred';
-
-    // Auto-logout on 401
-    if (status === 401) {
-      localStorage.removeItem('qd_token');
-      localStorage.removeItem('qd_user');
-      window.location.href = '/login';
-    }
 
     const normalizedError = new Error(
       Array.isArray(message) ? message.join(', ') : message,

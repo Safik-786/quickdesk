@@ -5,10 +5,12 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from '../users/users.module';
+import { RbacModule } from '../rbac/rbac.module';
 
 @Module({
   imports: [
     UsersModule,
+    RbacModule,
     PassportModule,
     JwtModule.registerAsync({
       useFactory: () => ({

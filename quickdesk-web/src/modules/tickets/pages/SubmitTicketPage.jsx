@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubmitTicket } from '../tickets.hooks';
-import Navbar from '../../core/components/Navbar';
 import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
 
@@ -20,8 +19,6 @@ export default function SubmitTicketPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
       <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Submit a Ticket</h1>

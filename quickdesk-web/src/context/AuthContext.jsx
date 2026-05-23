@@ -1,20 +1,20 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useReducer, useEffect } from 'react';
+import { axiosInstance } from '../lib/axios';
 
 const AuthContext = createContext(null);
 
 const initialState = {
   user: null,
-  token: null,
   isLoading: true,
 };
 
 function authReducer(state, action) {
   switch (action.type) {
     case 'LOGIN':
-      return { ...state, user: action.user, token: action.token, isLoading: false };
+      return { ...state, user: action.user, isLoading: false };
     case 'LOGOUT':
-      return { ...state, user: null, token: null, isLoading: false };
+      return { ...state, user: null, isLoading: false };
     case 'LOADED':
       return { ...state, isLoading: false };
     default:
@@ -27,23 +27,32 @@ export function AuthProvider({ children }) {
 
   // Rehydrate from localStorage on mount
   useEffect(() => {
-    const token = localStorage.getItem('qd_token');
     const user = localStorage.getItem('qd_user');
-    if (token && user) {
-      dispatch({ type: 'LOGIN', token, user: JSON.parse(user) });
+    if (user) {
+      dispatch({ type: 'LOGIN', user: JSON.parse(user) });
     } else {
       dispatch({ type: 'LOADED' });
     }
   }, []);
 
-  const login = (token, user) => {
-    localStorage.setItem('qd_token', token);
+  // Log user state changes for debugging
+  useEffect(() => {
+    if (state.user) {
+      console.log('Current authenticated user:', state.user);
+    }
+  }, [state.user]);
+
+  const login = (user) => {
     localStorage.setItem('qd_user', JSON.stringify(user));
-    dispatch({ type: 'LOGIN', token, user });
+    dispatch({ type: 'LOGIN', user });
   };
 
-  const logout = () => {
-    localStorage.removeItem('qd_token');
+  const logout = async () => {
+    try {
+      await axiosInstance.post('/auth/logout');
+    } catch (e) {
+      // Ignore errors on logout
+    }
     localStorage.removeItem('qd_user');
     dispatch({ type: 'LOGOUT' });
   };

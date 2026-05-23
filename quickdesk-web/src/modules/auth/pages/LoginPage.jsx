@@ -4,6 +4,7 @@ import { useLogin } from '../auth.hooks';
 import { useAuth } from '../../../context/AuthContext';
 import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
+import { ROLES } from '../../../constants/rbac';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   if (user) {
-    const dest = user.legacyRole === 'employee' ? '/my-tickets' : '/dashboard';
+    const userRoleCodes = user.roles?.map(r => r.code) || [];
+    const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/dashboard';
     navigate(dest, { replace: true });
     return null;
   }
@@ -23,7 +25,8 @@ export default function LoginPage() {
     e.preventDefault();
     login(form, {
       onSuccess: (data) => {
-        const dest = data.user.legacyRole === 'employee' ? '/my-tickets' : '/dashboard';
+        const userRoleCodes = data.user.roles?.map(r => r.code) || [];
+        const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/dashboard';
         navigate(dest, { replace: true });
       },
     });

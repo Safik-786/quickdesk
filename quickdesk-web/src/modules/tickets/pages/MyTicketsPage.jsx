@@ -1,7 +1,6 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useMyTickets } from '../tickets.hooks';
-import Navbar from '../../core/components/Navbar';
 import TicketCard from '../components/TicketCard';
 import Button from '../../core/components/ui/Button';
 
@@ -17,8 +16,6 @@ export default function MyTicketsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
       <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>

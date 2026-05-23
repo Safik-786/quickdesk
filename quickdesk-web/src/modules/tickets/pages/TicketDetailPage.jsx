@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTicket, useTicketDraft, useReplyTicket, useOverrideTicket } from '../tickets.hooks';
-import Navbar from '../../core/components/Navbar';
 import AuditLogTable from '../components/AuditLogTable';
 import AIDraftEditor from '../components/AIDraftEditor';
 import Input from '../../core/components/ui/Input';
@@ -44,8 +43,6 @@ export default function TicketDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
       <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Button
           variant="ghost"
