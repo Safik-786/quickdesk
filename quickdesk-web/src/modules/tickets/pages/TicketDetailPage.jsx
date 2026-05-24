@@ -10,7 +10,9 @@ import RichTextEditor, { FormattedText } from '../components/RichTextEditor';
 import { parseMarkdownToHtml } from '../utils/markdown';
 import toast from 'react-hot-toast';
 import UnifiedTicketChat from '../components/UnifiedTicketChat';
-import { useAuth } from '../../core/hooks/useAuth';
+// import { useAuth } from '../../core/hooks/useAuth';
+import { useAuth } from '../../../context/AuthContext';
+
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -46,7 +48,6 @@ export default function TicketDetailPage() {
   const [replyText, setReplyText] = useState('');
   const [lightboxIdx, setLightboxIdx] = useState(null);
 
-  const { data: ticket, isLoading, error } = useTicket(id);
   const { data: ticket, isLoading, error } = useTicket(id);
   const { mutate: overrideTicket, isPending: isOverriding } = useOverrideTicket(id);
   

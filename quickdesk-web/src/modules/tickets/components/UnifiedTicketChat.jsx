@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import Button from '../../core/components/ui/Button';
-import { useAuth } from '../../core/hooks/useAuth';
+import { useAuth } from '../../../context/AuthContext';
 import { useReplyTicket, useTicketDraft } from '../tickets.hooks';
 import RichTextEditor, { FormattedText } from './RichTextEditor';
 import AIDraftEditor from './AIDraftEditor';
