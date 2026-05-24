@@ -5,4 +5,4 @@ export const ROLE = {
   RBAC_MANAGER: 'RBAC_MANAGER',
 } as const;
 
-export type RoleType = typeof ROLE[keyof typeof ROLE];
+export type RoleType = (typeof ROLE)[keyof typeof ROLE];

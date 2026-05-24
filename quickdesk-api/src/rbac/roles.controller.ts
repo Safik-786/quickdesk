@@ -44,7 +44,7 @@ export class RolesController {
   @RequirePermissions('RBAC.READ')
   async getRolePermissions(@Param('id') id: string) {
     const role = await this.rolesService.findOne(id);
-    return role.rolePermissions.map(rp => rp.permission);
+    return role.rolePermissions.map((rp) => rp.permission);
   }
 
   @Patch(':id')
@@ -71,7 +71,10 @@ export class RolesController {
   /** Alternative endpoint for full sync (deprecated, use POST :id/permissions) */
   @Post(':id/permissions/sync')
   @RequirePermissions('RBAC.MANAGE')
-  syncPermissionsOld(@Param('id') id: string, @Body() dto: AssignPermissionsDto) {
+  syncPermissionsOld(
+    @Param('id') id: string,
+    @Body() dto: AssignPermissionsDto,
+  ) {
     return this.rolesService.syncPermissions(id, dto);
   }
 

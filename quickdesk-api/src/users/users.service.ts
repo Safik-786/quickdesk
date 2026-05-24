@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -16,7 +20,12 @@ export class UsersService {
     return this.prisma.user.create({ data });
   }
 
-  async createWithPassword(email: string, password: string, name?: string, isVerified?: boolean) {
+  async createWithPassword(
+    email: string,
+    password: string,
+    name?: string,
+    isVerified?: boolean,
+  ) {
     // Check if user exists
     const existing = await this.findByEmail(email);
     if (existing) {
@@ -25,7 +34,7 @@ export class UsersService {
 
     // Hash password
     const passwordHash = await bcrypt.hash(password, 12);
-    
+
     return this.prisma.user.create({
       data: {
         email,
@@ -143,7 +152,7 @@ export class UsersService {
     await this.prisma.$transaction([
       this.prisma.userRole.deleteMany({ where: { userId } }),
       this.prisma.userRole.createMany({
-        data: roleIds.map(roleId => ({
+        data: roleIds.map((roleId) => ({
           userId,
           roleId,
           grantedBy,

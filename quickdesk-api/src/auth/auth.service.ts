@@ -33,14 +33,14 @@ export class AuthService {
 
     // Assign default role (EMPLOYEE)
     const employeeRole = await this.prisma.rbacRole.findUnique({
-      where: { code: 'EMPLOYEE' }
+      where: { code: 'EMPLOYEE' },
     });
     if (employeeRole) {
       await this.prisma.userRole.create({
         data: {
           userId: user.id,
           roleId: employeeRole.id,
-        }
+        },
       });
     }
 
@@ -66,8 +66,10 @@ export class AuthService {
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret-change-me',
       });
-      
-      const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
       if (!user || !user.hashedRefreshToken) {
         throw new UnauthorizedException('Invalid refresh token');
       }
@@ -89,7 +91,7 @@ export class AuthService {
 
   private async signToken(userId: string, email: string, name: string) {
     const payload = { sub: userId, email, name };
-    
+
     // Generate tokens
     const access_token = this.jwtService.sign(payload);
     const refresh_token = this.jwtService.sign(payload, {
@@ -117,7 +119,7 @@ export class AuthService {
       where: { userId },
       include: { role: true },
     });
-    roles = userRoles.map(ur => ({
+    roles = userRoles.map((ur) => ({
       code: ur.role.code,
       name: ur.role.name,
       description: ur.role.description,
@@ -125,10 +127,11 @@ export class AuthService {
 
     // Fetch Permissions
     let permissions: string[] = [];
-    if (roles.some(r => r.code === 'ADMIN')) {
+    if (roles.some((r) => r.code === 'ADMIN')) {
       permissions = ['*'];
     } else {
-      const permSet = await this.permissionsService.getUserPermissionCodes(userId);
+      const permSet =
+        await this.permissionsService.getUserPermissionCodes(userId);
       permissions = Array.from(permSet);
     }
 

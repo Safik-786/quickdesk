@@ -40,13 +40,25 @@ export class TicketsGateway
     @MessageBody() data: { role: string; userId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    if (data.role === 'agent') {
+    // 1. Join user's private notification room
+    void client.join(`user:${data.userId}`);
+    this.logger.log(`User ${data.userId} joined private room user:${data.userId}`);
+
+    // 2. Join role-specific rooms
+    const roleLower = data.role?.toLowerCase();
+    if (roleLower === 'agent' || roleLower === 'admin') {
       void client.join('agents');
-      this.logger.log(`Agent ${data.userId} joined agents room`);
+      this.logger.log(`Agent/Admin ${data.userId} joined agents room`);
     } else {
       void client.join(`employee:${data.userId}`);
       this.logger.log(`Employee ${data.userId} joined their room`);
     }
+  }
+
+  // Send persistent notification to a specific user's private room
+  emitNotification(userId: string, notification: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    this.server.to(`user:${userId}`).emit('notification:received', notification);
   }
 
   // Called by TicketsService when a new ticket is created

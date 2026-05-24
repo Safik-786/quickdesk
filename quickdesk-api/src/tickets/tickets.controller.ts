@@ -25,7 +25,7 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { OverrideTicketDto } from './dto/override-ticket.dto';
 import { ReplyTicketDto } from './dto/reply-ticket.dto';
 import { TicketFilterDto } from './dto/ticket-filter.dto';
-import { ROLE } from '../auth/constants/roles.constant';
+import { TicketRateLimitGuard } from './guards/ticket-rate-limit.guard';
 
 @Controller('tickets')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -35,6 +35,7 @@ export class TicketsController {
   // Employee: submit a ticket
   @Post()
   @Roles('EMPLOYEE')
+  @UseGuards(TicketRateLimitGuard)
   @UseInterceptors(
     FilesInterceptor('screenshots', 5, {
       storage: diskStorage({
@@ -49,7 +50,10 @@ export class TicketsController {
       },
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-          return cb(new BadRequestException('Only image files are allowed!'), false);
+          return cb(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
         }
         cb(null, true);
       },

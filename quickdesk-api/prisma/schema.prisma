@@ -89,6 +89,7 @@ model User {
   resolved     Ticket[]    @relation("ResolvedByAgent")
   auditLogs    AuditLog[]
   userRoles    UserRole[]
+  notifications Notification[]
 }
 
 model Ticket {
@@ -130,6 +131,18 @@ model AuditLog {
   fromValue String
   toValue   String
   changedAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   // e.g. "ticket.created", "ticket.resolved"
+  ticketId  String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model KnowledgeChunk {

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useMyTickets } from '../tickets.hooks';
 import TicketCard from '../components/TicketCard';
 import TicketTable from '../components/TicketTable';
@@ -20,11 +21,27 @@ export default function MyTicketsPage() {
   const [filters, setFilters] = useState({ status: '', search: '', date: '', page: 1, limit: 10 });
   const [viewType, setViewType] = useState('card');
   const { data: response, isLoading, error } = useMyTickets(filters);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const tickets = Array.isArray(response) ? response : (response?.data || []);
   const totalPages = response?.totalPages || 1;
   const currentPage = response?.page || 1;
   const totalItems = response?.total || tickets.length;
+
+  const ticketIdParam = searchParams.get('ticketId');
+
+  useEffect(() => {
+    if (ticketIdParam && tickets.length > 0) {
+      const ticket = tickets.find(t => t.id === ticketIdParam);
+      if (ticket) {
+        setSelectedTicket(ticket);
+        // Clear param so it doesn't reopen if closed
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('ticketId');
+        setSearchParams(newParams, { replace: true });
+      }
+    }
+  }, [ticketIdParam, tickets, searchParams, setSearchParams]);
 
   const handlePageChange = (newPage) => {
     setFilters(prev => ({ ...prev, page: newPage }));

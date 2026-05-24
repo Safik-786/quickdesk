@@ -180,16 +180,16 @@ export default function RichTextEditor({
       
       {/* Editor Header & Tab Switcher */}
       <div className="flex justify-between items-center px-4 py-3 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
-        <div className="flex items-center gap-2">
+        <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/60 shadow-inner">
           <button
             type="button"
             onClick={() => setActiveTab('write')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-200 flex items-center gap-1.5 ${activeTab === 'write' ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' : 'text-gray-500 hover:text-gray-800'}`}
+            className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'write' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
-            Write Reply
+            Edit Response
           </button>
           <button
             type="button"
@@ -198,13 +198,13 @@ export default function RichTextEditor({
               setIsColorMenuOpen(false);
               setIsHighlightMenuOpen(false);
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-200 flex items-center gap-1.5 ${activeTab === 'display-board' ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' : 'text-gray-500 hover:text-gray-800'}`}
+            className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${activeTab === 'display-board' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            Display Board
-            <span className="bg-indigo-100 text-indigo-700 px-1 py-0.2 rounded-full text-[9px] font-bold">Live</span>
+            Customer View
+            <span className="bg-indigo-100 text-indigo-700 px-1 py-0.2 rounded-full text-[9px] font-extrabold tracking-wide uppercase scale-90">Live</span>
           </button>
         </div>
 

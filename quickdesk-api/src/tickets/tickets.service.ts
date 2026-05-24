@@ -9,7 +9,7 @@ import {
   type DraftReplyResult,
 } from '../ai-client/ai-client.service';
 import { AuditService } from '../audit/audit.service';
-import { TicketsGateway } from '../sockets/tickets.gateway';
+import { AppEventEmitter } from '../events/events.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { OverrideTicketDto } from './dto/override-ticket.dto';
 import { ReplyTicketDto } from './dto/reply-ticket.dto';
@@ -22,10 +22,14 @@ export class TicketsService {
     private readonly prisma: PrismaService,
     private readonly aiClient: AiClientService,
     private readonly auditService: AuditService,
-    private readonly gateway: TicketsGateway,
+    private readonly eventEmitter: AppEventEmitter,
   ) {}
 
-  async create(dto: CreateTicketDto, employeeId: string, screenshots: string[] = []) {
+  async create(
+    dto: CreateTicketDto,
+    employeeId: string,
+    screenshots: string[] = [],
+  ) {
     // Call AI service for classification
     const classification = await this.aiClient.classify({
       title: dto.title,
@@ -46,8 +50,8 @@ export class TicketsService {
       include: { employee: { select: { id: true, name: true, email: true } } },
     });
 
-    // Notify all agents via Socket.IO
-    this.gateway.notifyNewTicket(ticket);
+    // Emit asynchronous event for triaging notifications (Socket.IO + Email)
+    this.eventEmitter.emit('ticket.created', ticket);
 
     return ticket;
   }
@@ -84,7 +88,9 @@ export class TicketsService {
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
-        include: { employee: { select: { id: true, name: true, email: true } } },
+        include: {
+          employee: { select: { id: true, name: true, email: true } },
+        },
       }),
       this.prisma.ticket.count({ where }),
     ]);
@@ -130,7 +136,9 @@ export class TicketsService {
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
-        include: { employee: { select: { id: true, name: true, email: true } } },
+        include: {
+          employee: { select: { id: true, name: true, email: true } },
+        },
       }),
       this.prisma.ticket.count({ where }),
     ]);
@@ -231,8 +239,8 @@ export class TicketsService {
       include: { employee: { select: { id: true, name: true, email: true } } },
     });
 
-    // Notify the employee via Socket.IO
-    this.gateway.notifyTicketResolved(updated);
+    // Emit asynchronous event for resolution notifications (Socket.IO + Email)
+    this.eventEmitter.emit('ticket.resolved', updated);
 
     return updated;
   }

@@ -34,15 +34,15 @@ export class RolesGuard implements CanActivate {
       include: { role: true },
     });
 
-    const userRoleCodes = userRoles.map(ur => ur.role.code);
+    const userRoleCodes = userRoles.map((ur) => ur.role.code);
 
     // Admin bypass
     if (userRoleCodes.includes(ROLE.ADMIN)) return true;
 
-    if (!requiredRoles.some(r => userRoleCodes.includes(r))) {
+    if (!requiredRoles.some((r) => userRoleCodes.includes(r))) {
       throw new ForbiddenException('Insufficient permissions');
     }
-    
+
     return true;
   }
 }

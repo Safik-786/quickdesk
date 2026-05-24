@@ -1,4 +1,8 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { StructuredOutputParser } from '@langchain/core/output_parsers';
@@ -42,9 +46,13 @@ export class AiClientService {
     try {
       const parser = StructuredOutputParser.fromZodSchema(
         z.object({
-          category: z.enum(['IT', 'HR', 'Finance', 'Admin', 'Other']).describe('The department category'),
-          priority: z.enum(['Low', 'Medium', 'High']).describe('The priority level of the ticket'),
-        })
+          category: z
+            .enum(['IT', 'HR', 'Finance', 'Admin', 'Other'])
+            .describe('The department category'),
+          priority: z
+            .enum(['Low', 'Medium', 'High'])
+            .describe('The priority level of the ticket'),
+        }),
       );
 
       const prompt = PromptTemplate.fromTemplate(`
@@ -63,7 +71,7 @@ Ticket Description: {description}
         format_instructions: parser.getFormatInstructions(),
       });
 
-      return result as ClassifyResult;
+      return result;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('AI classify failed, using fallback', message);
@@ -75,13 +83,14 @@ Ticket Description: {description}
     try {
       const query = `${input.title}\n${input.description}`;
       const relevantDocs = await this.ragService.retrieveRelevantDocs(query);
-      
+
       const citations: string[] = [];
       let context = '';
 
       if (relevantDocs.length === 0) {
         return {
-          draft: "I don't have specific guidance for this issue in our knowledge base. A support agent will review your ticket and respond shortly.",
+          draft:
+            "I don't have specific guidance for this issue in our knowledge base. A support agent will review your ticket and respond shortly.",
           citations: [],
         };
       }
@@ -127,7 +136,9 @@ Draft Reply:
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('AI draft-reply failed', message);
-      throw new ServiceUnavailableException('AI service is currently unavailable');
+      throw new ServiceUnavailableException(
+        'AI service is currently unavailable',
+      );
     }
   }
 }

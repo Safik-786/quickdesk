@@ -17,29 +17,41 @@ export class RagService implements OnModuleInit {
   async onModuleInit() {
     try {
       this.logger.log('Initializing Postgres pgvector Store...');
-      
+
       // Dynamically import Xenova transformers to avoid module resolution conflicts
       const transformers = await import('@xenova/transformers');
       pipeline = transformers.pipeline;
 
-      this.extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
-        quantized: true,
-      });
-      
+      this.extractor = await pipeline(
+        'feature-extraction',
+        'Xenova/all-MiniLM-L6-v2',
+        {
+          quantized: true,
+        },
+      );
+
       this.isReady = true;
-      this.logger.log('pgvector Store successfully initialized and ready for queries.');
+      this.logger.log(
+        'pgvector Store successfully initialized and ready for queries.',
+      );
     } catch (error) {
       this.logger.error('Failed to initialize RAG Vector Store', error);
     }
   }
 
-  async retrieveRelevantDocs(query: string, k: number = 3): Promise<{ pageContent: string; metadata: { source: string } }[]> {
+  async retrieveRelevantDocs(
+    query: string,
+    k: number = 3,
+  ): Promise<{ pageContent: string; metadata: { source: string } }[]> {
     if (!this.isReady) {
       return [];
     }
-    
+
     // Embed query
-    const queryOutput = await this.extractor(query, { pooling: 'mean', normalize: true });
+    const queryOutput = await this.extractor(query, {
+      pooling: 'mean',
+      normalize: true,
+    });
     const queryVector = Array.from(queryOutput.data);
 
     // Similarity search via pgvector: 1 - (embedding <=> queryVector) is cosine similarity
@@ -50,7 +62,7 @@ export class RagService implements OnModuleInit {
       LIMIT ${k}
     `;
 
-    return results.map(row => ({
+    return results.map((row) => ({
       pageContent: row.content,
       metadata: { source: row.source },
     }));

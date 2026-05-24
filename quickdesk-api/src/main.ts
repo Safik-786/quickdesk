@@ -20,10 +20,14 @@ async function bootstrap() {
   const server = app.getHttpAdapter().getInstance();
 
   // Serve uploads — registered on raw Express so it bypasses NestJS routing
-  server.use('/uploads', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
-  }, express.static(join(process.cwd(), 'uploads')));
+  server.use(
+    '/uploads',
+    (req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      next();
+    },
+    express.static(join(process.cwd(), 'uploads')),
+  );
 
   server.get('/', (_req, res) => {
     res.json({ status: 'api is running', version: '1.0.0' });

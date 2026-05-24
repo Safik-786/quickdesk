@@ -8,6 +8,7 @@ import Button from '../../core/components/ui/Button';
 import Dropdown from '../../core/components/ui/Dropdown';
 import RichTextEditor, { FormattedText } from '../components/RichTextEditor';
 import { parseMarkdownToHtml } from '../utils/markdown';
+import toast from 'react-hot-toast';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -69,7 +70,10 @@ export default function TicketDetailPage() {
   const handleReply = () => {
     if (!replyText.trim()) return;
     replyTicket(replyText, {
-      onSuccess: () => setReplyText(''),
+      onSuccess: () => {
+        setReplyText('');
+        toast.success('Reply sent and ticket resolved successfully! 🎉');
+      },
     });
   };
 
@@ -196,13 +200,14 @@ export default function TicketDetailPage() {
             {draft?.draft && (
               <AIDraftEditor
                 draftText={draft.draft}
+                citations={draft.citations || ticket.citations || []}
                 onApply={(text) => setReplyText(parseMarkdownToHtml(text))}
               />
             )}
 
             {/* Reply Box */}
             <div className="bg-white rounded-xl border border-slate-200 p-2">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Reply</h3>
+              <h3 className="text-lg mt-2 font-bold bg-gradient-to-br from-cyan-600 via-blue-700 to-blue-900 text-transparent bg-clip-text mb-4">Add Reply</h3>
               <div className="mb-4">
                 <RichTextEditor
                   value={replyText}
@@ -252,7 +257,7 @@ export default function TicketDetailPage() {
           <div className="space-y-6">
             {/* Actions Sidebar */}
             <div className="bg-white rounded-xl  border border-slate-200 p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Ticket Actions</h3>
+              <h3 className="text-lg font-bold bg-gradient-to-br from-cyan-600 via-blue-700 to-blue-900 text-transparent bg-clip-text mb-4">Ticket Actions</h3>
 
               <Dropdown
                 label="Change Status"
@@ -296,7 +301,7 @@ export default function TicketDetailPage() {
 
             {/* Audit Log */}
             <div className="bg-white rounded-xl  border border-slate-200 p-2">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Audit Log</h3>
+              <h3 className="text-lg font-bold bg-gradient-to-br from-cyan-600 via-blue-700 to-blue-900 text-transparent bg-clip-text mb-4">Audit Log</h3>
               <AuditLogTable logs={ticket.auditLogs} />
             </div>
           </div>

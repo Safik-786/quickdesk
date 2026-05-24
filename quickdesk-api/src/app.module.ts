@@ -8,6 +8,8 @@ import { AuditModule } from './audit/audit.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { SocketsModule } from './sockets/sockets.module';
 import { AiClientModule } from './ai-client/ai-client.module';
+import { EventsModule } from './events/events.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { AiClientModule } from './ai-client/ai-client.module';
     MetricsModule,
     SocketsModule,
     AiClientModule,
+    EventsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
