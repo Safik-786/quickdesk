@@ -43,6 +43,8 @@ export default function MyTicketsPage() {
     }
   }, [ticketIdParam, tickets, searchParams, setSearchParams]);
 
+  const activeTicket = selectedTicket ? (tickets.find(t => t.id === selectedTicket.id) || selectedTicket) : null;
+
   const handlePageChange = (newPage) => {
     setFilters(prev => ({ ...prev, page: newPage }));
   };
@@ -135,7 +137,7 @@ export default function MyTicketsPage() {
         <TicketDetailSlideover
           isOpen={!!selectedTicket}
           onClose={() => setSelectedTicket(null)}
-          ticket={selectedTicket}
+          ticket={activeTicket}
         />
       </main>
     </div>

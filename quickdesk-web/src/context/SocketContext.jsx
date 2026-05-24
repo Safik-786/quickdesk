@@ -11,19 +11,19 @@ const SocketContext = createContext(null);
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 
 export function SocketProvider({ children }) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
 
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!user || !token) {
+    if (!user) {
       return;
     }
 
     const newSocket = io(SOCKET_URL, {
-      auth: { token },
+      withCredentials: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
     });
@@ -224,7 +224,7 @@ export function SocketProvider({ children }) {
       setSocket(null);
       setConnected(false);
     };
-  }, [user, token, queryClient]);
+  }, [user, queryClient]);
 
   const on = useCallback((event, handler) => {
     if (!socket) return () => {};
