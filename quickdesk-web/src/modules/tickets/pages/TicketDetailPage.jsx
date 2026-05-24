@@ -79,7 +79,7 @@ export default function TicketDetailPage() {
 
   return (
     <div className="min-h-screen bg-white rounded-xl shadow">
-      <main className="max-w-5xl mx-auto px-4 sm:p-6">
+      <main className="max-w-7xl mx-auto sm:p-6">
         <Button
           variant="ghost"
           size="sm"
