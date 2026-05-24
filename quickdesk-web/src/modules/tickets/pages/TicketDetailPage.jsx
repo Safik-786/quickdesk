@@ -10,7 +10,7 @@ import RichTextEditor, { FormattedText } from '../components/RichTextEditor';
 import { parseMarkdownToHtml } from '../utils/markdown';
 import toast from 'react-hot-toast';
 import TicketChatSlideover from '../components/TicketChatSlideover';
-import { useAuth } from '../../core/hooks/useAuth';
+import { useAuth } from '../../../context/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -243,7 +243,7 @@ export default function TicketDetailPage() {
                 <Button 
                   size="sm" 
                   onClick={() => setIsChatOpen(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full"
+                  className="bg-indigo-600 hover:bg-indigo-700 hover:text-white rounded-full"
                 >
                   <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />

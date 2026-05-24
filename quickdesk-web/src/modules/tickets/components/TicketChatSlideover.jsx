@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import Slideover from '../../core/components/ui/Slideover';
 import Button from '../../core/components/ui/Button';
-import { useAuth } from '../../core/hooks/useAuth';
+import { useAuth } from '../../../context/AuthContext';
 import { useReplyTicket } from '../tickets.hooks';
 import { FormattedText } from './RichTextEditor';
 
