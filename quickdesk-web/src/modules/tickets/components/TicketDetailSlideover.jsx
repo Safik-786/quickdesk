@@ -1,4 +1,5 @@
 import Slideover from '../../core/components/ui/Slideover';
+import { FormattedText } from './RichTextEditor';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -89,9 +90,7 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
               <span className="text-xs font-medium text-gray-500 mb-1 ml-2">Support Agent</span>
               <div className="bg-gray-50 text-gray-800 rounded-2xl rounded-tl-sm shadow-md p-4 border border-slate-200">
                 <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap leading-relaxed">
-                    {ticket.finalReply}
-                  </p>
+                  <FormattedText text={ticket.finalReply} />
                 </div>
                 {ticket.resolvedAt && (
                   <div className="mt-3 pt-3 border-t border-slate-200 flex justify-end">

@@ -4,9 +4,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTicket, useTicketDraft, useReplyTicket, useOverrideTicket } from '../tickets.hooks';
 import AuditLogTable from '../components/AuditLogTable';
 import AIDraftEditor from '../components/AIDraftEditor';
-import Input from '../../core/components/ui/Input';
 import Button from '../../core/components/ui/Button';
 import Dropdown from '../../core/components/ui/Dropdown';
+import RichTextEditor, { FormattedText } from '../components/RichTextEditor';
+import { parseMarkdownToHtml } from '../utils/markdown';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -52,6 +53,18 @@ export default function TicketDetailPage() {
   if (!ticket) return null;
 
   const screenshots = ticket.screenshots || [];
+
+  const replies = ticket.replies && ticket.replies.length > 0
+    ? ticket.replies
+    : ticket.finalReply
+      ? [
+          {
+            user: ticket.resolvedBy?.name || 'Support Agent',
+            text: ticket.finalReply,
+            createdAt: ticket.resolvedAt || ticket.updatedAt || ticket.createdAt,
+          }
+        ]
+      : [];
 
   const handleReply = () => {
     if (!replyText.trim()) return;
@@ -183,28 +196,29 @@ export default function TicketDetailPage() {
             {draft?.draft && (
               <AIDraftEditor
                 draftText={draft.draft}
-                onApply={(text) => setReplyText(text)}
+                onApply={(text) => setReplyText(parseMarkdownToHtml(text))}
               />
             )}
 
             {/* Reply Box */}
-            <div className="bg-white rounded-xl  border border-slate-200 p-2">
+            <div className="bg-white rounded-xl border border-slate-200 p-2">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Reply</h3>
-              <Input
-                rows={4}
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Type your response here..."
-                className="mb-4"
-              />
-              <div className="flex justify-between items-center">
+              <div className="mb-4">
+                <RichTextEditor
+                  value={replyText}
+                  onChange={setReplyText}
+                  placeholder="Type your response here..."
+                  ticketInfo={ticket}
+                />
+              </div>
+              <div className="flex justify-between items-center mt-4">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => getDraft()}
                   disabled={isDraftLoading}
                   isLoading={isDraftLoading}
-                  className="!px-0 text-blue-600 hover:text-blue-800 hover:bg-transparent"
+                  className="!px-0 text-indigo-600 hover:text-indigo-800 hover:bg-transparent"
                 >
                   {isDraftLoading ? 'Generating...' : 'Generate AI Suggestion'}
                 </Button>
@@ -219,16 +233,16 @@ export default function TicketDetailPage() {
             </div>
 
             {/* Replies List */}
-            {ticket.replies && ticket.replies.length > 0 && (
+            {replies && replies.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Conversation History</h3>
-                {ticket.replies.map((r, i) => (
+                {replies.map((r, i) => (
                   <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 ">
                     <div className="flex justify-between text-sm mb-2">
                       <span className="font-semibold text-gray-900">{r.user || 'User'}</span>
                       <span className="text-gray-500">{new Date(r.createdAt).toLocaleString()}</span>
                     </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">{r.text}</p>
+                    <FormattedText text={r.text} />
                   </div>
                 ))}
               </div>
