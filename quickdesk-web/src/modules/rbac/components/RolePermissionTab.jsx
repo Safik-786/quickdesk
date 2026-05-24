@@ -10,8 +10,8 @@ const ShieldCheckbox = ({ checked, onChange, disabled }) => (
     disabled={disabled}
     onClick={() => onChange(!checked)}
     className={`focus:outline-none transition-transform flex items-center justify-center w-8 h-8 rounded-full ${disabled
-        ? 'opacity-50 cursor-not-allowed'
-        : 'cursor-pointer hover:bg-gray-100 active:scale-90'
+      ? 'opacity-50 cursor-not-allowed'
+      : 'cursor-pointer hover:bg-gray-100 active:scale-90'
       }`}
     title={checked ? "Granted" : "Denied"}
   >
@@ -92,8 +92,8 @@ export default function RolePermissionTab() {
               <button
                 onClick={() => setSelectedRoleId(role.id)}
                 className={`w-full text-left px-4 py-3 rounded-lg border transition-all duration-200 ${selectedRoleId === role.id
-                    ? 'bg-blue-50 border-blue-200 shadow-sm ring-1 ring-blue-500'
-                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-slate-200'
+                  ? 'bg-blue-50 border-blue-200 shadow-sm ring-1 ring-blue-500'
+                  : 'bg-white border-slate-200 hover:bg-gray-50 hover:border-slate-200'
                   }`}
               >
                 <div className={`font-medium ${selectedRoleId === role.id ? 'text-blue-700' : 'text-gray-900'}`}>
@@ -138,7 +138,7 @@ export default function RolePermissionTab() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

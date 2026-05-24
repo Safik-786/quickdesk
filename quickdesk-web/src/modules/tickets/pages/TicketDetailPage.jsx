@@ -16,6 +16,20 @@ const STATUS_OPTIONS = [
   { value: 'closed', label: 'Closed' },
 ];
 
+const CATEGORY_OPTIONS = [
+  { value: 'IT', label: 'IT' },
+  { value: 'HR', label: 'HR' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Admin', label: 'Admin' },
+  { value: 'Other', label: 'Other' },
+];
+
+const PRIORITY_OPTIONS = [
+  { value: 'Low', label: 'Low' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'High', label: 'High' },
+];
+
 const backIcon = (
   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -27,13 +41,13 @@ export default function TicketDetailPage() {
   const navigate = useNavigate();
   const [replyText, setReplyText] = useState('');
   const [lightboxIdx, setLightboxIdx] = useState(null);
-  
+
   const { data: ticket, isLoading, error } = useTicket(id);
   const { data: draft, refetch: getDraft, isFetching: isDraftLoading } = useTicketDraft(id);
   const { mutate: replyTicket, isPending: isReplying } = useReplyTicket(id);
   const { mutate: overrideTicket, isPending: isOverriding } = useOverrideTicket(id);
 
-  if (isLoading) return <div className="h-screen flex items-center justify-center"><div className="animate-spin h-10 w-10 border-b-2 border-indigo-600 rounded-full"></div></div>;
+  if (isLoading) return <div className="h-screen flex items-center justify-center"><div className="animate-spin h-10 w-10 border-b-2 border-blue-600 rounded-full"></div></div>;
   if (error) return <div className="p-8 text-red-600 text-center">Error loading ticket: {error.message}</div>;
   if (!ticket) return null;
 
@@ -48,13 +62,13 @@ export default function TicketDetailPage() {
 
   return (
     <div className="min-h-screen bg-white rounded-xl shadow">
-      <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="max-w-5xl mx-auto px-4 sm:p-6">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate(-1)}
           iconLeft={backIcon}
-          className="mb-6 uppercase !px-0 text-indigo-800 hover:text-indigo-800 hover:bg-transparent"
+          className="mb-6 uppercase !px-0 text-blue-800 hover:text-blue-800 hover:bg-transparent"
         >
           Back to list
         </Button>
@@ -62,10 +76,10 @@ export default function TicketDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* Ticket Header & Info */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-xl  border border-slate-200 p-4">
               <div className="flex justify-between items-start mb-4">
-                <h1 className="text-2xl font-bold text-gray-900">{ticket.title}</h1>
-                <span className="px-3 py-1 rounded-full text-sm font-medium border bg-blue-50 text-blue-800 border-blue-200">
+                <h1 className="text-xl font-bold text-gray-900">{ticket.title}</h1>
+                <span className="px-3 py-1 rounded-full text-[12px] font-medium border bg-blue-50 text-blue-800 border-blue-200">
                   {ticket.status?.toUpperCase()}
                 </span>
               </div>
@@ -85,7 +99,7 @@ export default function TicketDetailPage() {
                       <button
                         key={idx}
                         onClick={() => setLightboxIdx(idx)}
-                        className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-50 hover:ring-2 hover:ring-indigo-400 transition group"
+                        className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 bg-gray-50 hover:ring-2 hover:ring-blue-400 transition group"
                       >
                         <img
                           src={`${API_BASE}/uploads/${filename}`}
@@ -166,15 +180,15 @@ export default function TicketDetailPage() {
             )}
 
             {/* AI Draft Section */}
-            {draft?.replyDraft && (
-              <AIDraftEditor 
-                draftText={draft.replyDraft} 
-                onApply={(text) => setReplyText(text)} 
+            {draft?.draft && (
+              <AIDraftEditor
+                draftText={draft.draft}
+                onApply={(text) => setReplyText(text)}
               />
             )}
 
             {/* Reply Box */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-xl  border border-slate-200 p-2">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Reply</h3>
               <Input
                 rows={4}
@@ -190,7 +204,7 @@ export default function TicketDetailPage() {
                   onClick={() => getDraft()}
                   disabled={isDraftLoading}
                   isLoading={isDraftLoading}
-                  className="!px-0 text-indigo-600 hover:text-indigo-800 hover:bg-transparent"
+                  className="!px-0 text-blue-600 hover:text-blue-800 hover:bg-transparent"
                 >
                   {isDraftLoading ? 'Generating...' : 'Generate AI Suggestion'}
                 </Button>
@@ -203,13 +217,13 @@ export default function TicketDetailPage() {
                 </Button>
               </div>
             </div>
-            
+
             {/* Replies List */}
             {ticket.replies && ticket.replies.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Conversation History</h3>
                 {ticket.replies.map((r, i) => (
-                  <div key={i} className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                  <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 ">
                     <div className="flex justify-between text-sm mb-2">
                       <span className="font-semibold text-gray-900">{r.user || 'User'}</span>
                       <span className="text-gray-500">{new Date(r.createdAt).toLocaleString()}</span>
@@ -223,9 +237,9 @@ export default function TicketDetailPage() {
 
           <div className="space-y-6">
             {/* Actions Sidebar */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-xl  border border-slate-200 p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Ticket Actions</h3>
-              
+
               <Dropdown
                 label="Change Status"
                 value={ticket.status}
@@ -233,12 +247,43 @@ export default function TicketDetailPage() {
                 options={STATUS_OPTIONS}
                 disabled={isOverriding}
               />
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <Dropdown
+                  label={
+                    <span className="flex justify-between items-center w-full">
+                      <span>Category</span>
+                      {!ticket.agentCategory && ticket.aiCategory && (
+                        <span className="text-[10px] uppercase tracking-wider font-semibold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">AI</span>
+                      )}
+                    </span>
+                  }
+                  value={ticket.agentCategory || ticket.aiCategory || 'Other'}
+                  onChange={(category) => overrideTicket({ category })}
+                  options={CATEGORY_OPTIONS}
+                  disabled={isOverriding}
+                />
+                <Dropdown
+                  label={
+                    <span className="flex justify-between items-center w-full">
+                      <span>Priority</span>
+                      {!ticket.agentPriority && ticket.aiPriority && (
+                        <span className="text-[10px] uppercase tracking-wider font-semibold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">AI</span>
+                      )}
+                    </span>
+                  }
+                  value={ticket.agentPriority || ticket.aiPriority || 'Low'}
+                  onChange={(priority) => overrideTicket({ priority })}
+                  options={PRIORITY_OPTIONS}
+                  disabled={isOverriding}
+                />
+              </div>
             </div>
 
             {/* Audit Log */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-xl  border border-slate-200 p-2">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Audit Log</h3>
-              <AuditLogTable logs={ticket.auditLog} />
+              <AuditLogTable logs={ticket.auditLogs} />
             </div>
           </div>
         </div>

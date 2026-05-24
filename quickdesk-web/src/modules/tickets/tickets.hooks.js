@@ -42,7 +42,8 @@ export function useSubmitTicket() {
   return useMutation({
     mutationFn: ticketsApi.submit,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.tickets.mine() });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.all() });
+      qc.invalidateQueries({ queryKey: queryKeys.metrics.summary() });
     },
   });
 }

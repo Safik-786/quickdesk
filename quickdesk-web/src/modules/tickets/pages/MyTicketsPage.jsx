@@ -34,9 +34,9 @@ export default function MyTicketsPage() {
     <div className="min-h-screen bg-white rounded-xl shadow">
       <main className="max-w-7xl mx-auto px-4 sm:p-6">
         <div className="flex justify-between items-center">
-          <PageHeader 
-            title="My Tickets" 
-            description="Track the status of your reported issues." 
+          <PageHeader
+            title="My Tickets"
+            description="Track the status of your reported issues."
             className="mb-0"
           />
           <Button iconLeft={plusIcon} onClick={() => setIsSubmitOpen(true)}>
@@ -45,9 +45,9 @@ export default function MyTicketsPage() {
         </div>
 
         <div className="mb-6">
-          <FilterBar 
-            filters={filters} 
-            setFilters={setFilters} 
+          <FilterBar
+            filters={filters}
+            setFilters={setFilters}
             viewType={viewType}
             setViewType={setViewType}
           />
@@ -62,7 +62,7 @@ export default function MyTicketsPage() {
             {error.message}
           </div>
         ) : tickets.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
+          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 border-dashed">
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -70,8 +70,8 @@ export default function MyTicketsPage() {
             <p className="mt-1 text-sm text-gray-500">You haven't submitted any tickets matching the filters.</p>
           </div>
         ) : viewType === 'table' ? (
-          <TicketTable 
-            tickets={tickets} 
+          <TicketTable
+            tickets={tickets}
             currentPage={currentPage}
             totalPages={totalPages}
             totalItems={totalItems}
@@ -110,15 +110,15 @@ export default function MyTicketsPage() {
           </div>
         )}
 
-        <SubmitTicketSlideover 
-          isOpen={isSubmitOpen} 
-          onClose={() => setIsSubmitOpen(false)} 
+        <SubmitTicketSlideover
+          isOpen={isSubmitOpen}
+          onClose={() => setIsSubmitOpen(false)}
         />
-        
-        <TicketDetailSlideover 
-          isOpen={!!selectedTicket} 
-          onClose={() => setSelectedTicket(null)} 
-          ticket={selectedTicket} 
+
+        <TicketDetailSlideover
+          isOpen={!!selectedTicket}
+          onClose={() => setSelectedTicket(null)}
+          ticket={selectedTicket}
         />
       </main>
     </div>

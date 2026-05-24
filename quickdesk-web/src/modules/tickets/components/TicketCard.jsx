@@ -6,7 +6,7 @@ const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http:/
 const statusColors = {
   open: 'bg-amber-100 text-amber-800 border-amber-200',
   resolved: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  closed: 'bg-gray-100 text-gray-800 border-gray-200',
+  closed: 'bg-gray-100 text-gray-800 border-slate-200',
 };
 
 export default function TicketCard({ ticket, onView }) {
@@ -15,7 +15,7 @@ export default function TicketCard({ ticket, onView }) {
   const overflow = screenshots.length - visibleScreenshots.length;
 
   const content = (
-    <div className="bg-white h-full rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col gap-3">
+    <div className="bg-white h-full rounded-xl  border border-slate-200 p-5 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col gap-3">
       {/* Header */}
       <div className="flex justify-between items-start">
         <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 flex-1 mr-3">{ticket.title}</h3>
@@ -36,7 +36,7 @@ export default function TicketCard({ ticket, onView }) {
             {visibleScreenshots.map((filename, idx) => (
               <div
                 key={idx}
-                className="relative w-16 h-12 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shrink-0"
+                className="relative w-16 h-12 rounded-lg overflow-hidden border border-slate-200 bg-gray-50 shrink-0"
               >
                 <img
                   src={`${API_BASE}/uploads/${filename}`}
@@ -47,7 +47,7 @@ export default function TicketCard({ ticket, onView }) {
               </div>
             ))}
             {overflow > 0 && (
-              <div className="w-16 h-12 rounded-lg border border-gray-200 bg-gray-100 flex items-center justify-center shrink-0">
+              <div className="w-16 h-12 rounded-lg border border-slate-200 bg-gray-100 flex items-center justify-center shrink-0">
                 <span className="text-xs font-semibold text-gray-500">+{overflow}</span>
               </div>
             )}

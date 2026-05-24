@@ -28,7 +28,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:safik@postgres:5432/quickdesk
       - PORT=3000
-    command: sh -c "npx prisma migrate deploy && npm run prisma:seed && npm run start:prod"
+      - FRONTEND_URL=http://localhost
+    command: sh -c "npx prisma db push && npm run prisma:seed && npm run start:prod"
     depends_on:
       - postgres
     restart: unless-stopped

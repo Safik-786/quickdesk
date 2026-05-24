@@ -5,7 +5,7 @@ const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http:/
 const statusColors = {
   open: 'bg-amber-100 text-amber-800 border-amber-200',
   resolved: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  closed: 'bg-gray-100 text-gray-800 border-gray-200',
+  closed: 'bg-gray-100 text-gray-800 border-slate-200',
 };
 
 function ScreenshotStack({ screenshots = [] }) {
@@ -21,7 +21,7 @@ function ScreenshotStack({ screenshots = [] }) {
           target="_blank"
           rel="noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="block w-10 h-8 rounded-md overflow-hidden border border-gray-200 bg-gray-50 hover:ring-2 hover:ring-indigo-400 transition shrink-0"
+          className="block w-10 h-8 rounded-md overflow-hidden border border-slate-200 bg-gray-50 hover:ring-2 hover:ring-indigo-400 transition shrink-0"
         >
           <img
             src={`${API_BASE}/uploads/${filename}`}
@@ -32,7 +32,7 @@ function ScreenshotStack({ screenshots = [] }) {
         </a>
       ))}
       {overflow > 0 && (
-        <span className="w-8 h-8 rounded-md border border-gray-200 bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500 shrink-0">
+        <span className="w-8 h-8 rounded-md border border-slate-200 bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500 shrink-0">
           +{overflow}
         </span>
       )}
@@ -40,10 +40,10 @@ function ScreenshotStack({ screenshots = [] }) {
   );
 }
 
-export default function TicketTable({ 
-  tickets = [], 
-  currentPage = 1, 
-  totalPages = 1, 
+export default function TicketTable({
+  tickets = [],
+  currentPage = 1,
+  totalPages = 1,
   totalItems = 0,
   onPageChange,
   onView
@@ -59,7 +59,7 @@ export default function TicketTable({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -114,7 +114,7 @@ export default function TicketTable({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     {onView ? (
-                      <button 
+                      <button
                         onClick={() => onView(ticket)}
                         className="text-indigo-600 hover:text-indigo-900 font-semibold cursor-pointer"
                       >
@@ -132,9 +132,9 @@ export default function TicketTable({
           </tbody>
         </table>
       </div>
-      
+
       {/* Footer with Pagination */}
-      <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+      <div className="bg-gray-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
         <div className="flex-1 flex justify-between sm:hidden">
           <button
             onClick={handlePrev}

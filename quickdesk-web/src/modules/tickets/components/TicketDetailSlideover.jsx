@@ -5,7 +5,7 @@ const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http:/
 const statusColors = {
   open: 'bg-amber-100 text-amber-800 border-amber-200',
   resolved: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  closed: 'bg-gray-100 text-gray-800 border-gray-200',
+  closed: 'bg-gray-100 text-gray-800 border-slate-200',
 };
 
 export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
@@ -23,7 +23,7 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
       <div className="flex flex-col gap-6 pt-2">
         {/* Top Info Banner */}
         <div className="flex justify-center mb-4">
-          <div className="bg-gray-100 px-4 py-1.5 rounded-full text-xs font-medium text-gray-600 flex items-center gap-2 shadow-sm border border-gray-200">
+          <div className="bg-gray-100 px-4 py-1.5 rounded-full text-xs font-medium text-gray-600 flex items-center gap-2 shadow-sm border border-slate-200">
             <span>{new Date(ticket.createdAt).toLocaleDateString()} at {new Date(ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             <span className="text-gray-300">•</span>
             <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-bold border ${statusColors[ticket.status] || statusColors.open} bg-white text-gray-800`}>
@@ -31,7 +31,7 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
             </span>
           </div>
         </div>
-        
+
         {/* Employee Message (Right Side) */}
         <div className="flex justify-end items-start gap-4 mb-4">
           <div className="flex flex-col items-end max-w-[85%]">
@@ -68,7 +68,7 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
               )}
             </div>
           </div>
-          
+
           {/* Profile Icon (Employee) */}
           <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shrink-0 border border-indigo-200 shadow-sm">
             {(ticket.employee?.name || 'You').charAt(0).toUpperCase()}
@@ -84,17 +84,17 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            
+
             <div className="flex flex-col items-start max-w-[85%]">
               <span className="text-xs font-medium text-gray-500 mb-1 ml-2">Support Agent</span>
-              <div className="bg-gray-50 text-gray-800 rounded-2xl rounded-tl-sm shadow-md p-4 border border-gray-200">
+              <div className="bg-gray-50 text-gray-800 rounded-2xl rounded-tl-sm shadow-md p-4 border border-slate-200">
                 <div className="prose prose-sm max-w-none">
                   <p className="whitespace-pre-wrap leading-relaxed">
                     {ticket.finalReply}
                   </p>
                 </div>
                 {ticket.resolvedAt && (
-                  <div className="mt-3 pt-3 border-t border-gray-200 flex justify-end">
+                  <div className="mt-3 pt-3 border-t border-slate-200 flex justify-end">
                     <span className="text-xs text-emerald-600 font-medium">
                       Resolved on {new Date(ticket.resolvedAt).toLocaleDateString()} at {new Date(ticket.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
@@ -105,16 +105,16 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
           </div>
         ) : (
           <div className="flex justify-start items-start gap-4 mt-4">
-             {/* Profile Icon (Agent - Placeholder) */}
-             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0 border border-gray-200 shadow-sm">
+            {/* Profile Icon (Agent - Placeholder) */}
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0 border border-slate-200 shadow-sm">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            
+
             <div className="flex flex-col items-start">
               <span className="text-xs font-medium text-gray-400 mb-1 ml-2">System</span>
-              <div className="bg-gray-50 border border-gray-200 border-dashed rounded-2xl rounded-tl-sm shadow-sm p-4 text-center">
+              <div className="bg-gray-50 border border-slate-200 border-dashed rounded-2xl rounded-tl-sm shadow-sm p-4 text-center">
                 <p className="text-sm text-gray-500 italic">Ticket is currently being reviewed by an agent.</p>
               </div>
             </div>

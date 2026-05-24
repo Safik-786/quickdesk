@@ -167,7 +167,7 @@ export default function UserRoleTab() {
         <Button onClick={() => openSlideover(null)}>Add New User</Button>
       </div>
 
-      <div className="overflow-x-auto bg-white border border-gray-200 rounded-lg">
+      <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -231,7 +231,7 @@ export default function UserRoleTab() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-gray-200 bg-white py-3">
+      <div className="flex items-center justify-between border-t border-slate-200 bg-white py-3">
         <div className="flex flex-1 justify-between sm:hidden">
           <Button variant="secondary" onClick={() => setPage(p => Math.max(1, p - 1))} isDisabled={page === 1}>Previous</Button>
           <Button variant="secondary" onClick={() => setPage(p => Math.min(totalPages, p + 1))} isDisabled={page >= totalPages}>Next</Button>

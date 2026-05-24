@@ -27,24 +27,23 @@ export default function RBACManagementPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <PageHeader 
-          title="RBAC Management" 
-          description="Manage users, roles, and permissions" 
+        <PageHeader
+          title="RBAC Management"
+          description="Manage users, roles, and permissions"
           className="mb-0"
         />
       </div>
 
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow-sm">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-slate-200">
           <div className="flex gap-0">
             <button
               onClick={() => setActiveTab('users')}
-              className={`px-6 py-4 font-medium text-sm border-b-2 transition-colors ${
-                activeTab === 'users'
+              className={`px-6 py-4 font-medium text-sm border-b-2 transition-colors ${activeTab === 'users'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               <span className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -55,11 +54,10 @@ export default function RBACManagementPage() {
             </button>
             <button
               onClick={() => setActiveTab('roles')}
-              className={`px-6 py-4 font-medium text-sm border-b-2 transition-colors ${
-                activeTab === 'roles'
+              className={`px-6 py-4 font-medium text-sm border-b-2 transition-colors ${activeTab === 'roles'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               <span className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

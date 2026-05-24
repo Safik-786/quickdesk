@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import Slideover from '../../core/components/ui/Slideover';
 import Input from '../../core/components/ui/Input';
 import { useSubmitTicket } from '../tickets.hooks';
@@ -32,6 +33,7 @@ export default function SubmitTicketSlideover({ isOpen, onClose }) {
   // Close when successfully submitted
   useEffect(() => {
     if (isSuccess && isOpen) {
+      toast.success('Ticket created successfully!');
       onClose();
     }
   }, [isSuccess, isOpen, onClose]);
@@ -72,12 +74,12 @@ export default function SubmitTicketSlideover({ isOpen, onClose }) {
   const handleSubmit = (e) => {
     // If triggered via form submit or button click
     if (e && e.preventDefault) e.preventDefault();
-    
+
     // Basic validation
     if (!form.title.trim() || !form.description.trim()) {
       return;
     }
-    
+
     const formData = new FormData();
     formData.append('title', form.title);
     formData.append('description', form.description);
@@ -85,14 +87,14 @@ export default function SubmitTicketSlideover({ isOpen, onClose }) {
     screenshots.forEach(s => {
       formData.append('screenshots', s.file);
     });
-    
+
     submitTicket(formData);
   };
 
   return (
-    <Slideover 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <Slideover
+      isOpen={isOpen}
+      onClose={onClose}
       title="Create New Ticket"
       primaryBtnText="Submit Ticket"
       onPrimaryClick={handleSubmit}
@@ -148,11 +150,11 @@ export default function SubmitTicketSlideover({ isOpen, onClose }) {
             </div>
           </div>
           {fileError && <p className="mt-2 text-sm text-red-600">{fileError}</p>}
-          
+
           {screenshots.length > 0 && (
             <div className="mt-4 grid grid-cols-3 gap-4">
               {screenshots.map((s, idx) => (
-                <div key={idx} className="relative group rounded-lg overflow-hidden border border-gray-200">
+                <div key={idx} className="relative group rounded-lg overflow-hidden border border-slate-200">
                   <img src={s.previewUrl} alt="preview" className="object-cover w-full h-24" />
                   <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <button

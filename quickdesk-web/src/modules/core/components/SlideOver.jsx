@@ -33,7 +33,7 @@ export default function SlideOver({
       {/* SlideOver */}
       <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md shadow-xl flex flex-col bg-white transform transition-transform duration-300 ease-out">
         {/* Header */}
-        <div className="h-16 border-b border-gray-200 px-6 flex items-center justify-between bg-white">
+        <div className="h-16 border-b border-slate-200 px-6 flex items-center justify-between bg-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg overflow-hidden bg-white flex-shrink-0">
               <img src={logoSrc} alt="Logo" className="w-full h-full object-cover" />
@@ -56,17 +56,16 @@ export default function SlideOver({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 px-6 py-4 bg-white flex items-center justify-end gap-3">
+        <div className="border-t border-slate-200 px-6 py-4 bg-white flex items-center justify-end gap-3">
           {footerButtons.map((btn, idx) => (
             <button
               key={idx}
               onClick={btn.onClick}
               disabled={btn.disabled}
-              className={`px-4 py-2 font-medium rounded-lg transition-colors ${
-                btn.variant === 'primary'
+              className={`px-4 py-2 font-medium rounded-lg transition-colors ${btn.variant === 'primary'
                   ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50'
                   : 'bg-gray-200 text-gray-900 hover:bg-gray-300 disabled:opacity-50'
-              }`}
+                }`}
             >
               {btn.label}
             </button>

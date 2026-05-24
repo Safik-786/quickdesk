@@ -17,7 +17,7 @@ const searchIcon = (
 
 export default function FilterBar({ filters, setFilters, viewType = 'card', setViewType }) {
   return (
-    <div className="p-2 bg-blue-50 rounded-xl border border-gray-200 flex flex-wrap gap-3 items-center justify-between">
+    <div className="p-2 bg-blue-50 rounded-xl border border-slate-200 flex flex-wrap gap-3 items-center justify-between">
       <div className="flex flex-wrap gap-3 items-center flex-1">
         <div className="flex-1 min-w-[200px]">
           <Input
@@ -28,7 +28,7 @@ export default function FilterBar({ filters, setFilters, viewType = 'card', setV
             iconLeft={searchIcon}
           />
         </div>
-        
+
         <div className="w-48">
           <Dropdown
             value={filters.status || ''}
@@ -53,9 +53,8 @@ export default function FilterBar({ filters, setFilters, viewType = 'card', setV
           <button
             type="button"
             onClick={() => setViewType('card')}
-            className={`p-1.5 cursor-pointer rounded-md transition-colors ${
-              viewType === 'card' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
-            }`}
+            className={`p-1.5 cursor-pointer rounded-md transition-colors ${viewType === 'card' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+              }`}
             title="Card View"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,9 +64,8 @@ export default function FilterBar({ filters, setFilters, viewType = 'card', setV
           <button
             type="button"
             onClick={() => setViewType('table')}
-            className={`p-1 rounded-md cursor-pointer transition-colors ${
-              viewType === 'table' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
-            }`}
+            className={`p-1 rounded-md cursor-pointer transition-colors ${viewType === 'table' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+              }`}
             title="Tabular View"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

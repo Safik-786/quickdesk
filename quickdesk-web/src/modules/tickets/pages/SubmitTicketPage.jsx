@@ -21,12 +21,12 @@ export default function SubmitTicketPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <PageHeader 
-          title="Submit a Ticket" 
-          description="Describe your issue and we'll get back to you shortly." 
+        <PageHeader
+          title="Submit a Ticket"
+          description="Describe your issue and we'll get back to you shortly."
         />
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">

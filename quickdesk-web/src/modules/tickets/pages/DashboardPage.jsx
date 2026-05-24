@@ -23,15 +23,15 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white rounded-xl shadow">
       <main className="max-w-7xl mx-auto px-4 py-8 sm:p-6">
-        <PageHeader 
-          title="Agent Dashboard" 
+        <PageHeader
+          title="Agent Dashboard"
           description="Manage and respond to customer tickets."
         />
 
         <div className="mb-6">
-          <FilterBar 
-            filters={filters} 
-            setFilters={setFilters} 
+          <FilterBar
+            filters={filters}
+            setFilters={setFilters}
             viewType={viewType}
             setViewType={setViewType}
           />
@@ -46,13 +46,13 @@ export default function DashboardPage() {
             {error.message}
           </div>
         ) : tickets.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
+          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 border-dashed">
             <h3 className="text-lg font-medium text-gray-900">No tickets found</h3>
             <p className="mt-1 text-sm text-gray-500">Try adjusting your filters.</p>
           </div>
         ) : viewType === 'table' ? (
-          <TicketTable 
-            tickets={tickets} 
+          <TicketTable
+            tickets={tickets}
             currentPage={currentPage}
             totalPages={totalPages}
             totalItems={totalItems}
