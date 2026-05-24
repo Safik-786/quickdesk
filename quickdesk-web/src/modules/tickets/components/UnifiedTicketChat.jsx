@@ -7,6 +7,7 @@ import Modal from '../../core/components/ui/Modal';
 import { useReplyTicket, useTicketDraft, useOverrideTicket, useResolveTicket } from '../tickets.hooks';
 import RichTextEditor, { FormattedText } from './RichTextEditor';
 import AIDraftEditor from './AIDraftEditor';
+import AIDraftLoader from './AIDraftLoader';
 import AuditLogSlideover from './AuditLogSlideover';
 import { parseMarkdownToHtml } from '../utils/markdown';
 import toast from 'react-hot-toast';

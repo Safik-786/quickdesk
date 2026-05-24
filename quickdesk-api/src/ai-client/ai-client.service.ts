@@ -20,9 +20,16 @@ interface ClassifyResult {
   confidence: number;
 }
 
+interface ConversationMessage {
+  sender: string;
+  message: string;
+  timestamp: string;
+}
+
 interface DraftReplyInput {
   title: string;
   description: string;
+  conversationHistory?: ConversationMessage[];
 }
 
 export interface DraftReplyResult {
@@ -109,6 +116,19 @@ Ticket Description: {description}
         context += `\n[Source: ${source}]\n${doc.pageContent}\n`;
       }
 
+      // Build conversation history section
+      let conversationSection = '';
+      if (
+        input.conversationHistory &&
+        input.conversationHistory.length > 0
+      ) {
+        conversationSection = `\n---\nConversation History (oldest to newest):\n`;
+        for (const msg of input.conversationHistory) {
+          conversationSection += `[${msg.sender} at ${msg.timestamp}]: ${msg.message}\n`;
+        }
+        conversationSection += `\n---\nIMPORTANT: The above conversation has already taken place. Your new draft reply MUST continue the conversation naturally. Do NOT repeat information or suggestions already given. Address any new questions or follow-ups from the employee. If the issue seems unresolved, suggest the next logical troubleshooting step.\n`;
+      }
+
       const prompt = PromptTemplate.fromTemplate(`
 You are a helpful IT support agent at a company. Use the following knowledge base articles to draft a professional reply to the employee's support ticket.
 
@@ -116,6 +136,7 @@ IMPORTANT RULES:
 - Base your reply ONLY on the provided knowledge base articles.
 - Do not make up information not present in the articles.
 - Be concise, friendly, and actionable.
+{conversationHistory}
 
 Knowledge Base Articles:
 {context}
@@ -133,6 +154,7 @@ Draft Reply:
         context,
         title: input.title,
         description: input.description,
+        conversationHistory: conversationSection,
       });
 
       return {

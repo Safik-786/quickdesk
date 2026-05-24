@@ -178,9 +178,17 @@ export class TicketsService {
   async getDraftReply(id: string): Promise<DraftReplyResult> {
     const ticket = await this.findOne(id);
 
+    // Build conversation history from existing replies
+    const conversationHistory = (ticket.replies || []).map((reply: any) => ({
+      sender: reply.user?.name || 'Unknown',
+      message: reply.message,
+      timestamp: new Date(reply.createdAt).toISOString(),
+    }));
+
     const result = await this.aiClient.draftReply({
       title: ticket.title,
       description: ticket.description,
+      conversationHistory,
     });
 
     // Store the AI draft on the ticket
