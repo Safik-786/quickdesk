@@ -168,6 +168,7 @@ export class TicketsService {
           include: { user: { select: { id: true, name: true, email: true } } },
           orderBy: { createdAt: 'asc' },
         },
+        resolvedBy: { select: { id: true, name: true, email: true } },
       },
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
