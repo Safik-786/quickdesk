@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # ── PostgreSQL with pgvector ──
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: quickdesk-pgvector
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: safik
+      POSTGRES_DB: quickdesk
+    ports:
+      - "5433:5432"
+    volumes:
+      - quickdesk_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # ── NestJS API ──
+  api:
+    build:
+      context: ./quickdesk-api
+      dockerfile: Dockerfile
+    container_name: quickdesk-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./quickdesk-api/.env
+    environment:
+      - DATABASE_URL=postgresql://postgres:safik@postgres:5432/quickdesk
+      - PORT=3000
+    command: sh -c "npx prisma migrate deploy && npm run prisma:seed && npm run start:prod"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # ── React Vite Web App ──
+  web:
+    build:
+      context: ./quickdesk-web
+      dockerfile: Dockerfile
+    container_name: quickdesk-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  quickdesk_pgdata:

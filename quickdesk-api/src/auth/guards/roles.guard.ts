@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { RequestWithUser } from '../interfaces/jwt-user.interface';
+import { ROLE } from '../constants/roles.constant';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -36,13 +37,9 @@ export class RolesGuard implements CanActivate {
     const userRoleCodes = userRoles.map(ur => ur.role.code);
 
     // Admin bypass
-    if (userRoleCodes.includes('ADMIN')) return true;
+    if (userRoleCodes.includes(ROLE.ADMIN)) return true;
 
-    // The legacy controllers might still use lowercase role strings like 'agent' and 'employee'
-    // in their @Roles() decorator. Map them to uppercase RBAC codes for comparison.
-    const requiredCodes = requiredRoles.map(r => r.toUpperCase());
-
-    if (!requiredCodes.some(r => userRoleCodes.includes(r))) {
+    if (!requiredRoles.some(r => userRoleCodes.includes(r))) {
       throw new ForbiddenException('Insufficient permissions');
     }
     

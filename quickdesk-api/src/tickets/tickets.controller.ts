@@ -25,6 +25,7 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { OverrideTicketDto } from './dto/override-ticket.dto';
 import { ReplyTicketDto } from './dto/reply-ticket.dto';
 import { TicketFilterDto } from './dto/ticket-filter.dto';
+import { ROLE } from '../auth/constants/roles.constant';
 
 @Controller('tickets')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -33,7 +34,7 @@ export class TicketsController {
 
   // Employee: submit a ticket
   @Post()
-  @Roles('employee')
+  @Roles('EMPLOYEE')
   @UseInterceptors(
     FilesInterceptor('screenshots', 5, {
       storage: diskStorage({
@@ -65,35 +66,35 @@ export class TicketsController {
 
   // Employee: view own tickets
   @Get('mine')
-  @Roles('employee')
+  @Roles('EMPLOYEE')
   findMine(@Query() filters: TicketFilterDto, @CurrentUser() user: JwtUser) {
     return this.ticketsService.findMine(user.id, filters);
   }
 
   // Agent: view all tickets with filters
   @Get()
-  @Roles('agent')
+  @Roles('AGENT')
   findAll(@Query() filters: TicketFilterDto) {
     return this.ticketsService.findAll(filters);
   }
 
   // Agent: get ticket detail
   @Get(':id')
-  @Roles('agent')
+  @Roles('AGENT')
   findOne(@Param('id') id: string) {
     return this.ticketsService.findOne(id);
   }
 
   // Agent: get AI draft reply for a ticket
   @Get(':id/draft')
-  @Roles('agent')
+  @Roles('AGENT')
   getDraft(@Param('id') id: string) {
     return this.ticketsService.getDraftReply(id);
   }
 
   // Agent: override AI-suggested category/priority
   @Patch(':id/override')
-  @Roles('agent')
+  @Roles('AGENT')
   override(
     @Param('id') id: string,
     @Body() dto: OverrideTicketDto,
@@ -104,7 +105,7 @@ export class TicketsController {
 
   // Agent: send reply and resolve ticket
   @Post(':id/reply')
-  @Roles('agent')
+  @Roles('AGENT')
   reply(
     @Param('id') id: string,
     @Body() dto: ReplyTicketDto,

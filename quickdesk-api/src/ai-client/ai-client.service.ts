@@ -1,5 +1,5 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
-import { ChatOpenAI } from '@langchain/openai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { StructuredOutputParser } from '@langchain/core/output_parsers';
 import { z } from 'zod';
@@ -28,15 +28,12 @@ export interface DraftReplyResult {
 @Injectable()
 export class AiClientService {
   private readonly logger = new Logger(AiClientService.name);
-  private llm: ChatOpenAI;
+  private llm: ChatGoogleGenerativeAI;
 
   constructor(private readonly ragService: RagService) {
-    this.llm = new ChatOpenAI({
-      apiKey: process.env.XAI_API_KEY,
-      configuration: {
-        baseURL: 'https://api.x.ai/v1',
-      },
-      modelName: 'grok-beta',
+    this.llm = new ChatGoogleGenerativeAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      model: 'gemini-flash-latest',
       temperature: 0.2,
     });
   }
@@ -124,7 +121,7 @@ Draft Reply:
       });
 
       return {
-        draft: response.content.toString().trim(),
+        draft: (response as any).content.toString().trim(),
         citations,
       };
     } catch (error: unknown) {

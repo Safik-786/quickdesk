@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as path from 'path';
+import * as fs from 'fs';
+import { ROLE } from '../src/auth/constants/roles.constant';
 
 const prisma = new PrismaClient();
 
@@ -59,14 +62,14 @@ const PERMISSIONS = [
 const ROLES = [
   {
     name: 'Administrator',
-    code: 'ADMIN',
+    code: ROLE.ADMIN,
     description: 'Full system access — all permissions',
     isSystem: true,
     permissions: PERMISSIONS.map((p) => p.code), // all
   },
   {
     name: 'Support Agent',
-    code: 'AGENT',
+    code: ROLE.AGENT,
     description: 'Can view all tickets, reply, resolve, and override AI suggestions',
     isSystem: true,
     permissions: [
@@ -80,7 +83,7 @@ const ROLES = [
   },
   {
     name: 'Employee',
-    code: 'EMPLOYEE',
+    code: ROLE.EMPLOYEE,
     description: 'Can submit tickets and view their own tickets',
     isSystem: true,
     permissions: [
@@ -90,7 +93,7 @@ const ROLES = [
   },
   {
     name: 'RBAC Manager',
-    code: 'RBAC_MANAGER',
+    code: ROLE.RBAC_MANAGER,
     description: 'Can manage roles, permissions, and user assignments',
     isSystem: false,
     permissions: [
@@ -208,6 +211,45 @@ async function main() {
   console.log(`  ✅ admin@quickdesk.com  (password: admin123)`);
   console.log(`  ✅ agent@quickdesk.com  (password: agent123)`);
   console.log(`  ✅ employee@quickdesk.com  (password: employee123)`);
+
+  // ── Seed AI Knowledge Base ──────────────────────────────────────────────────
+  console.log('  Seeding AI Knowledge Base (pgvector)...');
+  const kbCount = await prisma.knowledgeChunk.count();
+  if (kbCount === 0) {
+    const kbDir = path.join(process.cwd(), 'kb');
+    if (fs.existsSync(kbDir)) {
+      const transformers = await import('@xenova/transformers');
+      const pipeline = transformers.pipeline;
+      const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { quantized: true });
+
+      const files = fs.readdirSync(kbDir).filter((f: string) => f.endsWith('.md'));
+      let chunkCount = 0;
+      for (const file of files) {
+        const filePath = path.join(kbDir, file);
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const paragraphs = content.split(/\n\s*\n/);
+        for (const p of paragraphs) {
+          const text = p.trim();
+          if (text.length > 20) {
+            const output = await extractor(text, { pooling: 'mean', normalize: true });
+            const vector = Array.from(output.data);
+            
+            await prisma.$executeRaw`
+              INSERT INTO "KnowledgeChunk" (id, content, source, embedding)
+              VALUES (gen_random_uuid()::text, ${text}, ${file}, ${vector}::vector)
+            `;
+            chunkCount++;
+          }
+        }
+      }
+      console.log(`  ✅ ${chunkCount} knowledge chunks seeded`);
+    } else {
+      console.log('  ⚠️ Knowledge base directory not found, skipping.');
+    }
+  } else {
+    console.log(`  ✅ Found ${kbCount} knowledge chunks, skipping.`);
+  }
+
   console.log('\n✅ Seed complete.');
 }
 
