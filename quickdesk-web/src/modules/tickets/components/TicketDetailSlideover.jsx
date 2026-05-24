@@ -1,5 +1,10 @@
+import { useState } from 'react';
 import Slideover from '../../core/components/ui/Slideover';
 import { FormattedText } from './RichTextEditor';
+import TicketChatSlideover from './TicketChatSlideover';
+import Button from '../../core/components/ui/Button';
+import { useResolveTicket } from '../tickets.hooks';
+import toast from 'react-hot-toast';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -10,7 +15,24 @@ const statusColors = {
 };
 
 export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const { mutate: resolveTicket, isPending: isResolving } = useResolveTicket(ticket?.id);
+
   if (!ticket) return null;
+
+  const latestReply = ticket.replies && ticket.replies.length > 0 
+    ? ticket.replies[ticket.replies.length - 1] 
+    : ticket.finalReply 
+      ? { message: ticket.finalReply, user: ticket.resolvedBy || { name: 'Support Agent' }, createdAt: ticket.resolvedAt || ticket.updatedAt }
+      : null;
+
+  const handleResolve = () => {
+    resolveTicket(undefined, {
+      onSuccess: () => {
+        toast.success('Ticket marked as resolved!');
+      }
+    });
+  };
 
   return (
     <Slideover
@@ -76,49 +98,54 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
           </div>
         </div>
 
-        {/* Agent Response / Chat Interface (Left Side) */}
-        {ticket.finalReply ? (
-          <div className="flex justify-start items-start gap-4">
-            {/* Profile Icon (Agent) */}
-            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 border border-emerald-200 shadow-sm">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-
-            <div className="flex flex-col items-start max-w-[85%]">
-              <span className="text-xs font-medium text-gray-500 mb-1 ml-2">Support Agent</span>
-              <div className="bg-gray-50 text-gray-800 rounded-2xl rounded-tl-sm shadow-md p-4 border border-slate-200">
-                <div className="prose prose-sm max-w-none">
-                  <FormattedText text={ticket.finalReply} />
-                </div>
-                {ticket.resolvedAt && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 flex justify-end">
-                    <span className="text-xs text-emerald-600 font-medium">
-                      Resolved on {new Date(ticket.resolvedAt).toLocaleDateString()} at {new Date(ticket.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-start items-start gap-4 mt-4">
-            {/* Profile Icon (Agent - Placeholder) */}
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0 border border-slate-200 shadow-sm">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-
-            <div className="flex flex-col items-start">
-              <span className="text-xs font-medium text-gray-400 mb-1 ml-2">System</span>
-              <div className="bg-gray-50 border border-slate-200 border-dashed rounded-2xl rounded-tl-sm shadow-sm p-4 text-center">
-                <p className="text-sm text-gray-500 italic">Ticket is currently being reviewed by an agent.</p>
-              </div>
+        {/* Conversation Summary & Actions */}
+        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-slate-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-800">Live Thread</h3>
+            <div className="flex gap-2">
+              {ticket.status !== 'resolved' && ticket.status !== 'closed' && (
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={handleResolve}
+                  disabled={isResolving}
+                  className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                >
+                  Mark as Resolved
+                </Button>
+              )}
+              <Button 
+                size="sm" 
+                onClick={() => setIsChatOpen(true)}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                Open Chat
+              </Button>
             </div>
           </div>
-        )}
+
+          {latestReply ? (
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-semibold text-indigo-700">{latestReply.user?.name || 'Agent'}</span>
+                <span className="text-gray-500">{new Date(latestReply.createdAt).toLocaleTimeString()}</span>
+              </div>
+              <div className="text-sm text-gray-700 line-clamp-2">
+                <FormattedText text={latestReply.message} />
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500 italic bg-gray-50 p-3 rounded-lg border border-dashed border-gray-200 text-center">
+              Agent is reviewing your ticket.
+            </div>
+          )}
+        </div>
+
+        <TicketChatSlideover 
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          ticket={ticket}
+        />
       </div>
     </Slideover>
   );

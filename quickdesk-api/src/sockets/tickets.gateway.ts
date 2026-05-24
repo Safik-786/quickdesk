@@ -73,4 +73,19 @@ export class TicketsGateway
       .emit('ticket:resolved', ticket);
     this.server.to('agents').emit('ticket:resolved', ticket);
   }
+
+  // Live Chat: Join a specific ticket's room
+  @SubscribeMessage('joinTicket')
+  handleJoinTicket(
+    @MessageBody() ticketId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    void client.join(`ticket:${ticketId}`);
+    this.logger.log(`Client ${client.id} joined room ticket:${ticketId}`);
+  }
+
+  // Live Chat: Broadcast new reply to the ticket's room
+  broadcastTicketReply(ticketId: string, reply: any) {
+    this.server.to(`ticket:${ticketId}`).emit('ticket:reply', reply);
+  }
 }

@@ -64,8 +64,18 @@ export function useReplyTicket(ticketId) {
   return useMutation({
     mutationFn: (reply) => ticketsApi.reply(ticketId, reply),
     onSuccess: (updatedTicket) => {
-      // Update the detail cache directly
-      qc.setQueryData(queryKeys.tickets.detail(ticketId), updatedTicket);
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.lists() });
+    },
+  });
+}
+
+export function useResolveTicket(ticketId) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => ticketsApi.resolve(ticketId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
       qc.invalidateQueries({ queryKey: queryKeys.tickets.lists() });
     },
   });

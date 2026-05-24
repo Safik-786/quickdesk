@@ -15,6 +15,7 @@ import { OverrideTicketDto } from './dto/override-ticket.dto';
 import { ReplyTicketDto } from './dto/reply-ticket.dto';
 import { Prisma } from '@prisma/client';
 import { TicketFilterDto } from './dto/ticket-filter.dto';
+import { TicketsGateway } from '../sockets/tickets.gateway';
 
 @Injectable()
 export class TicketsService {
@@ -23,6 +24,7 @@ export class TicketsService {
     private readonly aiClient: AiClientService,
     private readonly auditService: AuditService,
     private readonly eventEmitter: AppEventEmitter,
+    private readonly gateway: TicketsGateway,
   ) {}
 
   async create(
@@ -162,6 +164,10 @@ export class TicketsService {
           include: { agent: { select: { id: true, name: true, email: true } } },
           orderBy: { changedAt: 'desc' },
         },
+        replies: {
+          include: { user: { select: { id: true, name: true, email: true } } },
+          orderBy: { createdAt: 'asc' },
+        },
       },
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
@@ -223,7 +229,40 @@ export class TicketsService {
     return this.prisma.ticket.update({ where: { id }, data: updates });
   }
 
-  async reply(id: string, dto: ReplyTicketDto, agentId: string) {
+  async reply(id: string, dto: ReplyTicketDto, userId: string) {
+    const ticket = await this.findOne(id);
+    if (ticket.status === 'resolved') {
+      throw new ForbiddenException('Ticket is already resolved');
+    }
+
+    // Determine if user is agent or employee based on logic in controller, 
+    // but here we just create a reply
+    const reply = await this.prisma.ticketReply.create({
+      data: {
+        ticketId: id,
+        userId: userId,
+        message: dto.reply,
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+      }
+    });
+
+    // Update status to in_progress if it's the first reply and the ticket is still open
+    if (ticket.status === 'open') {
+      await this.prisma.ticket.update({
+        where: { id },
+        data: { status: 'in_progress' }
+      });
+    }
+
+    // Broadcast via WebSockets
+    this.gateway.broadcastTicketReply(id, reply);
+
+    return reply;
+  }
+
+  async resolveTicket(id: string, userId: string) {
     const ticket = await this.findOne(id);
     if (ticket.status === 'resolved') {
       throw new ForbiddenException('Ticket is already resolved');
@@ -232,17 +271,14 @@ export class TicketsService {
     const updated = await this.prisma.ticket.update({
       where: { id },
       data: {
-        finalReply: dto.reply,
         status: 'resolved',
         resolvedAt: new Date(),
-        resolvedById: agentId,
+        resolvedById: userId,
       },
       include: { employee: { select: { id: true, name: true, email: true } } },
     });
 
-    // Emit asynchronous event for resolution notifications (Socket.IO + Email)
     this.eventEmitter.emit('ticket.resolved', updated);
-
     return updated;
   }
 }

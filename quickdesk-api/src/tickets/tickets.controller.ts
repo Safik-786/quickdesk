@@ -82,9 +82,9 @@ export class TicketsController {
     return this.ticketsService.findAll(filters);
   }
 
-  // Agent: get ticket detail
+  // Agent or Employee: get ticket detail
   @Get(':id')
-  @Roles('AGENT')
+  @Roles('AGENT', 'EMPLOYEE')
   findOne(@Param('id') id: string) {
     return this.ticketsService.findOne(id);
   }
@@ -107,14 +107,24 @@ export class TicketsController {
     return this.ticketsService.override(id, dto, user.id);
   }
 
-  // Agent: send reply and resolve ticket
+  // Agent or Employee: send reply in the thread
   @Post(':id/reply')
-  @Roles('AGENT')
+  @Roles('AGENT', 'EMPLOYEE')
   reply(
     @Param('id') id: string,
     @Body() dto: ReplyTicketDto,
     @CurrentUser() user: JwtUser,
   ) {
     return this.ticketsService.reply(id, dto, user.id);
+  }
+
+  // Employee: Resolve the ticket
+  @Patch(':id/resolve')
+  @Roles('EMPLOYEE', 'AGENT')
+  resolve(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtUser,
+  ) {
+    return this.ticketsService.resolveTicket(id, user.id);
   }
 }

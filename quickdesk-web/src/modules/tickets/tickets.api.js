@@ -24,4 +24,5 @@ export const ticketsApi = {
   getDraft: (id) => axiosInstance.get(`/tickets/${id}/draft`),
   override: (id, data) => axiosInstance.patch(`/tickets/${id}/override`, data),
   reply: (id, reply) => axiosInstance.post(`/tickets/${id}/reply`, { reply }),
+  resolve: (id) => axiosInstance.patch(`/tickets/${id}/resolve`),
 };

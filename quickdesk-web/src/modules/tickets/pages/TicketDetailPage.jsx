@@ -9,6 +9,8 @@ import Dropdown from '../../core/components/ui/Dropdown';
 import RichTextEditor, { FormattedText } from '../components/RichTextEditor';
 import { parseMarkdownToHtml } from '../utils/markdown';
 import toast from 'react-hot-toast';
+import TicketChatSlideover from '../components/TicketChatSlideover';
+import { useAuth } from '../../core/hooks/useAuth';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -48,6 +50,9 @@ export default function TicketDetailPage() {
   const { data: draft, refetch: getDraft, isFetching: isDraftLoading } = useTicketDraft(id);
   const { mutate: replyTicket, isPending: isReplying } = useReplyTicket(id);
   const { mutate: overrideTicket, isPending: isOverriding } = useOverrideTicket(id);
+  
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const { user } = useAuth();
 
   if (isLoading) return <div className="h-screen flex items-center justify-center"><div className="animate-spin h-10 w-10 border-b-2 border-blue-600 rounded-full"></div></div>;
   if (error) return <div className="p-8 text-red-600 text-center">Error loading ticket: {error.message}</div>;
@@ -55,17 +60,11 @@ export default function TicketDetailPage() {
 
   const screenshots = ticket.screenshots || [];
 
-  const replies = ticket.replies && ticket.replies.length > 0
-    ? ticket.replies
-    : ticket.finalReply
-      ? [
-          {
-            user: ticket.resolvedBy?.name || 'Support Agent',
-            text: ticket.finalReply,
-            createdAt: ticket.resolvedAt || ticket.updatedAt || ticket.createdAt,
-          }
-        ]
-      : [];
+  const latestReply = ticket.replies && ticket.replies.length > 0 
+    ? ticket.replies[ticket.replies.length - 1] 
+    : ticket.finalReply 
+      ? { message: ticket.finalReply, user: ticket.resolvedBy || { name: 'Support Agent' }, createdAt: ticket.resolvedAt || ticket.updatedAt }
+      : null;
 
   const handleReply = () => {
     if (!replyText.trim()) return;
@@ -237,21 +236,44 @@ export default function TicketDetailPage() {
               </div>
             </div>
 
-            {/* Replies List */}
-            {replies && replies.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Conversation History</h3>
-                {replies.map((r, i) => (
-                  <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 ">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="font-semibold text-gray-900">{r.user || 'User'}</span>
-                      <span className="text-gray-500">{new Date(r.createdAt).toLocaleString()}</span>
-                    </div>
-                    <FormattedText text={r.text} />
-                  </div>
-                ))}
+            {/* Live Chat & Latest Reply Summary */}
+            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Conversation Thread</h3>
+                <Button 
+                  size="sm" 
+                  onClick={() => setIsChatOpen(true)}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full"
+                >
+                  <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                  </svg>
+                  Read All Thread
+                </Button>
               </div>
-            )}
+
+              {latestReply ? (
+                <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                  <div className="flex justify-between text-xs mb-2">
+                    <span className="font-semibold text-indigo-700">Latest message from {latestReply.user?.name || 'Agent'}</span>
+                    <span className="text-gray-500">{new Date(latestReply.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div className="text-sm text-gray-700 line-clamp-3">
+                    <FormattedText text={latestReply.message} />
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500 text-center py-4 italic">
+                  No replies yet. Open the thread to start chatting!
+                </div>
+              )}
+            </div>
+
+            <TicketChatSlideover 
+              isOpen={isChatOpen}
+              onClose={() => setIsChatOpen(false)}
+              ticket={ticket}
+            />
           </div>
 
           <div className="space-y-6">

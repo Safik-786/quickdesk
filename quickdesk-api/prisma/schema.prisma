@@ -13,6 +13,7 @@ datasource db {
 
 enum TicketStatus {
   open
+  in_progress
   resolved
 }
 
@@ -90,6 +91,7 @@ model User {
   auditLogs    AuditLog[]
   userRoles    UserRole[]
   notifications Notification[]
+  replies       TicketReply[]
 }
 
 model Ticket {
@@ -120,6 +122,7 @@ model Ticket {
   resolvedAt DateTime?
 
   auditLogs AuditLog[]
+  replies   TicketReply[]
 }
 
 model AuditLog {
@@ -152,3 +155,14 @@ model KnowledgeChunk {
   source    String
   embedding Unsupported("vector(384)")?
 }
+
+model TicketReply {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  createdAt DateTime @default(now())
+}
+
