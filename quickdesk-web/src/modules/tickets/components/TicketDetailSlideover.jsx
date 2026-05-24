@@ -59,7 +59,7 @@ export default function TicketDetailSlideover({ isOpen, onClose, ticket }) {
                         <img
                           src={`${API_BASE}/uploads/${filename}`}
                           alt={`Attachment ${idx + 1}`}
-                          className="object-contain w-full h-full mix-blend-screen transition-opacity group-hover:opacity-75"
+                          className="object-contain w-full h-full transition-opacity group-hover:opacity-75"
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
                       </a>

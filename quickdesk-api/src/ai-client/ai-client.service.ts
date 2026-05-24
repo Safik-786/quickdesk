@@ -17,6 +17,7 @@ interface ClassifyInput {
 interface ClassifyResult {
   category: string;
   priority: string;
+  confidence: number;
 }
 
 interface DraftReplyInput {
@@ -52,6 +53,11 @@ export class AiClientService {
           priority: z
             .enum(['Low', 'Medium', 'High'])
             .describe('The priority level of the ticket'),
+          confidence: z
+            .number()
+            .min(0)
+            .max(1)
+            .describe('Your confidence score between 0.0 and 1.0 for how certain you are about the category and priority classification'),
         }),
       );
 
@@ -75,7 +81,7 @@ Ticket Description: {description}
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('AI classify failed, using fallback', message);
-      return { category: 'Other', priority: 'Medium' };
+      return { category: 'Other', priority: 'Medium', confidence: 0.5 };
     }
   }
 

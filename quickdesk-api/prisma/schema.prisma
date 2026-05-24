@@ -102,6 +102,7 @@ model Ticket {
 
   aiCategory    String?
   aiPriority    String?
+  aiConfidence  Float?
   aiDraft       String?
   citations     String[]
 

@@ -45,6 +45,7 @@ export class TicketsService {
         employeeId,
         aiCategory: classification.category,
         aiPriority: classification.priority,
+        aiConfidence: classification.confidence,
         status: 'open',
       },
       include: { employee: { select: { id: true, name: true, email: true } } },
