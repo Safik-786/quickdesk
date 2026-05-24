@@ -50,7 +50,7 @@ export default function App() {
               <Route
                 path="/tickets/:id"
                 element={
-                  <ProtectedRoute role={ROLES.AGENT}>
+                  <ProtectedRoute role={[ROLES.AGENT, ROLES.EMPLOYEE]}>
                     <TicketDetailPage />
                   </ProtectedRoute>
                 }

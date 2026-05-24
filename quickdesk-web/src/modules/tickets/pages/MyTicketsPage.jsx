@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMyTickets } from '../tickets.hooks';
 import TicketCard from '../components/TicketCard';
 import TicketTable from '../components/TicketTable';
 import FilterBar from '../components/FilterBar';
 import Button from '../../core/components/ui/Button';
 import SubmitTicketSlideover from '../components/SubmitTicketSlideover';
-import TicketDetailSlideover from '../components/TicketDetailSlideover';
+
 import PageHeader from '../../../components/ui/PageHeader';
 
 const plusIcon = (
@@ -22,6 +22,7 @@ export default function MyTicketsPage() {
   const [viewType, setViewType] = useState('card');
   const { data: response, isLoading, error } = useMyTickets(filters);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const tickets = Array.isArray(response) ? response : (response?.data || []);
   const totalPages = response?.totalPages || 1;
@@ -34,16 +35,18 @@ export default function MyTicketsPage() {
     if (ticketIdParam && tickets.length > 0) {
       const ticket = tickets.find(t => t.id === ticketIdParam);
       if (ticket) {
-        setSelectedTicket(ticket);
-        // Clear param so it doesn't reopen if closed
+        // Clear param so it doesn't loop
         const newParams = new URLSearchParams(searchParams);
         newParams.delete('ticketId');
         setSearchParams(newParams, { replace: true });
+        navigate(`/tickets/${ticket.id}`);
       }
     }
-  }, [ticketIdParam, tickets, searchParams, setSearchParams]);
+  }, [ticketIdParam, tickets, searchParams, setSearchParams, navigate]);
 
-  const activeTicket = selectedTicket ? (tickets.find(t => t.id === selectedTicket.id) || selectedTicket) : null;
+  const handleViewTicket = (ticket) => {
+    navigate(`/tickets/${ticket.id || ticket._id}`);
+  };
 
   const handlePageChange = (newPage) => {
     setFilters(prev => ({ ...prev, page: newPage }));
@@ -95,13 +98,13 @@ export default function MyTicketsPage() {
             totalPages={totalPages}
             totalItems={totalItems}
             onPageChange={handlePageChange}
-            onView={setSelectedTicket}
+            onView={handleViewTicket}
           />
         ) : (
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tickets.map(ticket => (
-                <TicketCard key={ticket.id || ticket._id} ticket={ticket} onView={setSelectedTicket} />
+                <TicketCard key={ticket.id || ticket._id} ticket={ticket} onView={handleViewTicket} />
               ))}
             </div>
             {/* Simple pagination for card view as well */}
@@ -132,12 +135,6 @@ export default function MyTicketsPage() {
         <SubmitTicketSlideover
           isOpen={isSubmitOpen}
           onClose={() => setIsSubmitOpen(false)}
-        />
-
-        <TicketDetailSlideover
-          isOpen={!!selectedTicket}
-          onClose={() => setSelectedTicket(null)}
-          ticket={activeTicket}
         />
       </main>
     </div>

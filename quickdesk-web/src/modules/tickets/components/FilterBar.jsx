@@ -34,6 +34,7 @@ export default function FilterBar({ filters, setFilters, viewType = 'card', setV
             value={filters.status || ''}
             onChange={(val) => setFilters({ ...filters, status: val, page: 1 })}
             options={STATUS_OPTIONS}
+            buttonClassName="text-sm! py-2"
             placeholder="All Statuses"
           />
         </div>

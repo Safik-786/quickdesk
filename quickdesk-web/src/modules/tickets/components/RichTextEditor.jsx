@@ -50,6 +50,9 @@ export default function RichTextEditor({
   placeholder = 'Type your response here...',
   disabled = false,
   ticketInfo = {},
+  showHeader = true,
+  centerToolbarContent,
+  endToolbarContent,
 }) {
   const [activeTab, setActiveTab] = useState('write'); // 'write' or 'display-board'
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -176,11 +179,12 @@ export default function RichTextEditor({
   };
 
   return (
-    <div className={`flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm transition-all duration-300 ${isFullscreen ? 'fixed inset-4 z-50 shadow-2xl ring-1 ring-slate-900/10' : 'relative'}`}>
+    <div className={`flex flex-col overflow-hidden bg-white rounded-xl border border-slate-200 transition-all duration-300 ${isFullscreen ? 'fixed inset-4 z-50 shadow-2xl ring-1 ring-slate-900/10' : 'relative'}`}>
       
       {/* Editor Header & Tab Switcher */}
-      <div className="flex justify-between items-center px-4 py-3 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
-        <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/60 shadow-inner">
+      {showHeader && (
+        <div className="flex justify-between items-center px-4 py-3 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
+          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/60 shadow-inner">
           <button
             type="button"
             onClick={() => setActiveTab('write')}
@@ -208,65 +212,16 @@ export default function RichTextEditor({
           </button>
         </div>
 
-        {/* Action controls */}
-        <div className="flex items-center gap-2">
-          {activeTab === 'write' && (
-            <>
-              {/* Undo */}
-              <button
-                type="button"
-                onClick={() => executeCommand('undo')}
-                disabled={disabled}
-                className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-white transition-colors"
-                title="Undo"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                </svg>
-              </button>
-              {/* Redo */}
-              <button
-                type="button"
-                onClick={() => executeCommand('redo')}
-                disabled={disabled}
-                className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-white transition-colors"
-                title="Redo"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
-                </svg>
-              </button>
-            </>
-          )}
-
-          <div className="h-4 w-px bg-slate-200 mx-1"></div>
-
-          {/* Fullscreen Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-1.5 rounded text-gray-500 hover:text-gray-800 hover:bg-white transition-colors flex items-center"
-            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-          >
-            {isFullscreen ? (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-16-4V7a3 3 0 013-3h10a3 3 0 013 3v4M4 10h16" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2" />
-              </svg>
-            )}
-          </button>
         </div>
-      </div>
+      )}
 
       {activeTab === 'write' ? (
         <>
           {/* Rich Text Toolbar */}
-          <div className="flex flex-wrap gap-1 p-2 border-b border-slate-100 bg-white sticky top-0 z-25">
-            {/* Bold */}
-            <button
+          <div className="flex justify-between items-center rounded-t-xl w-full border-b border-slate-100 bg-white sticky top-0 z-25">
+            <div className="flex flex-wrap gap-1">
+              {/* Bold */}
+              <button
               type="button"
               onClick={() => executeCommand('bold')}
               className={`p-1.5 rounded font-bold transition-all ${editorStates.bold ? 'bg-indigo-50 text-indigo-700 font-extrabold ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
@@ -514,10 +469,61 @@ export default function RichTextEditor({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
             </button>
+            </div>
+
+            {/* Action controls */}
+            <div className="flex items-center gap-2 pr-2">
+              {centerToolbarContent}
+              {/* Undo */}
+              <button
+                type="button"
+                onClick={() => executeCommand('undo')}
+                disabled={disabled}
+                className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-slate-50 transition-colors"
+                title="Undo"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+              </button>
+              {/* Redo */}
+              <button
+                type="button"
+                onClick={() => executeCommand('redo')}
+                disabled={disabled}
+                className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-slate-50 transition-colors"
+                title="Redo"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+                </svg>
+              </button>
+
+              <div className="h-4 w-px bg-slate-200 mx-1"></div>
+
+              {/* Fullscreen Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="p-1.5 rounded text-gray-500 hover:text-gray-800 hover:bg-slate-50 transition-colors flex items-center"
+                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              >
+                {isFullscreen ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-16-4V7a3 3 0 013-3h10a3 3 0 013 3v4M4 10h16" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2" />
+                  </svg>
+                )}
+              </button>
+              {endToolbarContent}
+            </div>
           </div>
 
           {/* Editable Canvas */}
-          <div className="relative flex-grow bg-white rounded-b-xl min-h-[180px] p-4 flex flex-col focus-within:ring-2 focus-within:ring-indigo-400 focus-within:ring-offset-0 focus-within:outline-none transition-all">
+          <div className="relative flex-grow overflow-hidden bg-white px-4 py-2 flex flex-col focus-within:ring-offset-0 focus-within:outline-none transition-all">
             <div
               ref={editorRef}
               contentEditable={!disabled}
@@ -526,7 +532,7 @@ export default function RichTextEditor({
               onKeyUp={updateSelectionStates}
               onMouseUp={updateSelectionStates}
               onFocus={updateSelectionStates}
-              className="flex-grow focus:outline-none text-slate-800 text-sm overflow-y-auto max-h-[400px] leading-relaxed 
+              className="flex-grow focus:outline-none text-slate-800 text-sm overflow-y-auto overflow-x-hidden break-words max-h-[100px] leading-relaxed 
                 h-full prose prose-sm prose-slate max-w-none
                 prose-headings:font-bold prose-headings:text-slate-900 
                 prose-p:leading-relaxed prose-p:mb-3.5 prose-p:text-slate-700
@@ -534,19 +540,19 @@ export default function RichTextEditor({
                 prose-ol:list-decimal prose-ol:list-inside prose-ol:pl-4 prose-ol:my-2
                 prose-strong:font-bold prose-strong:text-slate-900
                 prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-2 prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50/80 prose-blockquote:rounded-r-md prose-blockquote:italic"
-              style={{ minHeight: '160px' }}
+              style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
             />
             
             {/* Custom Placeholder */}
             {!value && (
-              <div className="absolute top-4 left-4 text-gray-400 text-sm pointer-events-none select-none italic">
+              <div className="absolute top-2 left-2 text-gray-400 text-sm pointer-events-none select-none italic">
                 {placeholder}
               </div>
             )}
           </div>
           
           {/* Quick stats footer */}
-          <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50 flex justify-between text-xs text-gray-500 rounded-b-xl">
+          <div className="px-2 py-1 border-t border-slate-100 bg-slate-50/50 flex justify-between text-[10px] text-gray-500 rounded-b-xl">
             <div className="flex gap-4">
               <span><strong>{wordCount}</strong> words</span>
               <span><strong>{charCount}</strong> characters</span>
