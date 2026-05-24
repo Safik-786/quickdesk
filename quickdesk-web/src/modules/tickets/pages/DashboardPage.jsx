@@ -21,8 +21,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white rounded-xl shadow">
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:p-6">
+    <div className="min-h-screen bg-white rounded-xl shadow overflow-hidden w-full max-w-full">
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:p-6 max-w-full overflow-hidden">
         <PageHeader
           title="Agent Dashboard"
           description="Manage and respond to customer tickets."

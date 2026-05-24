@@ -3,7 +3,8 @@ import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../core/components/ui/Button';
 import Dropdown from '../../core/components/ui/Dropdown';
-import { useReplyTicket, useTicketDraft, useOverrideTicket } from '../tickets.hooks';
+import Modal from '../../core/components/ui/Modal';
+import { useReplyTicket, useTicketDraft, useOverrideTicket, useResolveTicket } from '../tickets.hooks';
 import RichTextEditor, { FormattedText } from './RichTextEditor';
 import AIDraftEditor from './AIDraftEditor';
 import AuditLogSlideover from './AuditLogSlideover';
@@ -44,7 +45,10 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
 
   const { mutate: replyTicket, isPending: isReplying } = useReplyTicket(ticket?.id);
   const { mutate: overrideTicket, isPending: isOverriding } = useOverrideTicket(ticket?.id);
+  const { mutate: resolveTicket, isPending: isResolving } = useResolveTicket(ticket?.id);
   const { data: draft, refetch: getDraft, isFetching: isDraftLoading } = useTicketDraft(ticket?.id, { enabled: false });
+
+  const [isDraftModalOpen, setIsDraftModalOpen] = useState(false);
 
   // Initialize messages from ticket.replies
   useEffect(() => {
@@ -135,9 +139,28 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
           </div>
         </div>
 
-        {/* Horizontal Actions (Agent Only) */}
-        {isAgent && (
-          <div className="flex items-center py-2 gap-3">
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-3">
+          {!isTicketClosed && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => resolveTicket()}
+              isLoading={isResolving}
+              className="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-200"
+              iconLeft={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              }
+            >
+              Resolve
+            </Button>
+          )}
+
+          {/* Horizontal Actions (Agent Only) */}
+          {isAgent && (
+            <div className="flex items-center py-2 gap-3">
             <div className="w-32">
               <Dropdown
                 value={ticket.status}
@@ -179,6 +202,7 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
             </Button>
           </div>
         )}
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -291,34 +315,42 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
       {/* Input / Agent Notepad Area */}
       <div className="bg-white border-t border-slate-200 p-2 shrink-0 relative">
 
-        {/* Sticky Agent AI Draft Section */}
-        {isAgent && !isTicketClosed && draft?.draft && (
-          <div className="absolute bottom-full left-0 right-0 mb-4 mx-4 shadow-xl border border-blue-200 rounded-xl overflow-hidden bg-white z-10 animate-fade-in-up">
-            <div className="bg-blue-50/80 backdrop-blur px-3 py-2 border-b border-blue-100 flex justify-between items-center">
-              <h4 className="text-xs font-bold text-blue-800 uppercase tracking-wider flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                AI Notepad Suggestion
-              </h4>
-              <button onClick={() => getDraft()} className="text-gray-400 hover:text-gray-600 transition p-1">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        {/* Agent AI Draft Modal */}
+        <Modal 
+          isOpen={isDraftModalOpen} 
+          onClose={() => setIsDraftModalOpen(false)}
+          title="AI Suggested Reply"
+          maxWidth="max-w-2xl"
+          footer={
+            draft?.draft && !isDraftLoading && (
+              <div className="flex justify-end">
+                <Button 
+                  onClick={() => {
+                    setReplyText(parseMarkdownToHtml(draft.draft));
+                    setIsDraftModalOpen(false);
+                    toast.success('Draft injected into input!');
+                  }}
+                >
+                  Use Suggestion
+                </Button>
+              </div>
+            )
+          }
+        >
+          {isDraftLoading ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <p className="text-sm text-gray-500">Generating AI suggestion...</p>
             </div>
-            <div className="p-3 max-h-64 overflow-y-auto bg-gradient-to-b from-white to-slate-50">
-              <AIDraftEditor
-                draftText={draft.draft}
-                citations={draft.citations || ticket.citations || []}
-                onApply={(text) => {
-                  setReplyText(parseMarkdownToHtml(text));
-                  toast.success('Draft injected into input!');
-                }}
-              />
-            </div>
-          </div>
-        )}
+          ) : draft?.draft ? (
+            <AIDraftEditor
+              draftText={draft.draft}
+              citations={draft.citations || ticket.citations || []}
+            />
+          ) : (
+            <div className="py-8 text-center text-gray-500">Failed to generate AI suggestion.</div>
+          )}
+        </Modal>
 
         {isTicketClosed ? (
           <div className="text-center text-sm text-gray-500 italic py-3 bg-gray-50 rounded-lg border border-dashed border-gray-200">
@@ -337,15 +369,18 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => getDraft()}
+                    onClick={() => {
+                      setIsDraftModalOpen(true);
+                      getDraft();
+                    }}
                     disabled={isDraftLoading}
                     isLoading={isDraftLoading}
-                    className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 !px-2 !py-1 h-7 text-xs ml-1"
+                    className="text-indigo-600 whitespace-nowrap hover:text-indigo-800 hover:bg-indigo-50 !px-2 !py-1 h-7 text-xs ml-1"
                   >
                     <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                     </svg>
-                    {isDraftLoading ? 'Generating AI Suggestion...' : 'Generate AI Suggestion'}
+                    {isDraftLoading ? 'Generating...' : 'AI Reply'}
                   </Button>
                 ) : null
               }

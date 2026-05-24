@@ -59,8 +59,8 @@ export default function TicketTable({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-      <div className="overflow-x-auto">
+    <div className="bg-white w-full max-w-full rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+      <div className="overflow-x-auto w-full max-w-full">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

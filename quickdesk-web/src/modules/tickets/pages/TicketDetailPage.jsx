@@ -13,7 +13,7 @@ export default function TicketDetailPage() {
   const { mutate: overrideTicket, isPending: isOverriding } = useOverrideTicket(id);
   
   const { user } = useAuth();
-  const isAgentUser = user?.roles?.some(r => r.code === 'agent' || r.code === 'admin');
+  const isAgentUser = user?.roles?.some(r => r.code === 'AGENT' || r.code === 'ADMIN');
 
   if (isLoading) return <div className="h-screen flex items-center justify-center"><div className="animate-spin h-10 w-10 border-b-2 border-blue-600 rounded-full"></div></div>;
   if (error) return <div className="p-8 text-red-600 text-center">Error loading ticket: {error.message}</div>;
