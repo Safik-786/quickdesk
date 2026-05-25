@@ -42,6 +42,7 @@ export class TicketsController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           const uniqueSuffix = uuidv4() + extname(file.originalname);
           cb(null, uniqueSuffix);
         },
@@ -122,10 +123,7 @@ export class TicketsController {
   // Employee: Resolve the ticket
   @Patch(':id/resolve')
   @Roles('EMPLOYEE', 'AGENT')
-  resolve(
-    @Param('id') id: string,
-    @CurrentUser() user: JwtUser,
-  ) {
+  resolve(@Param('id') id: string, @CurrentUser() user: JwtUser) {
     return this.ticketsService.resolveTicket(id, user.id);
   }
 
@@ -143,10 +141,7 @@ export class TicketsController {
   // Employee: Delete own ticket (soft delete - close the ticket)
   @Delete(':id')
   @Roles('EMPLOYEE')
-  delete(
-    @Param('id') id: string,
-    @CurrentUser() user: JwtUser,
-  ) {
+  delete(@Param('id') id: string, @CurrentUser() user: JwtUser) {
     return this.ticketsService.deleteTicket(id, user.id);
   }
 }

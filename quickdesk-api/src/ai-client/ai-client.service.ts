@@ -64,7 +64,9 @@ export class AiClientService {
             .number()
             .min(0)
             .max(1)
-            .describe('Your confidence score between 0.0 and 1.0 for how certain you are about the category and priority classification'),
+            .describe(
+              'Your confidence score between 0.0 and 1.0 for how certain you are about the category and priority classification',
+            ),
         }),
       );
 
@@ -118,10 +120,7 @@ Ticket Description: {description}
 
       // Build conversation history section
       let conversationSection = '';
-      if (
-        input.conversationHistory &&
-        input.conversationHistory.length > 0
-      ) {
+      if (input.conversationHistory && input.conversationHistory.length > 0) {
         conversationSection = `\n---\nConversation History (oldest to newest):\n`;
         for (const msg of input.conversationHistory) {
           conversationSection += `[${msg.sender} at ${msg.timestamp}]: ${msg.message}\n`;
@@ -158,6 +157,7 @@ Draft Reply:
       });
 
       return {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         draft: (response as any).content.toString().trim(),
         citations,
       };

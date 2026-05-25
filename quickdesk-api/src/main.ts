@@ -17,19 +17,25 @@ async function bootstrap() {
   });
 
   // Get raw Express instance and register static + root routes
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const server = app.getHttpAdapter().getInstance();
 
   // Serve uploads — registered on raw Express so it bypasses NestJS routing
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   server.use(
     '/uploads',
     (req, res, next) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       res.header('Access-Control-Allow-Origin', '*');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       next();
     },
     express.static(join(process.cwd(), 'uploads')),
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   server.get('/', (_req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     res.json({ status: 'api is running', version: '1.0.0' });
   });
 

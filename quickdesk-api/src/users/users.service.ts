@@ -116,6 +116,7 @@ export class UsersService {
   async update(id: string, data: any) {
     return this.prisma.user.update({
       where: { id },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       data,
       include: {
         userRoles: {

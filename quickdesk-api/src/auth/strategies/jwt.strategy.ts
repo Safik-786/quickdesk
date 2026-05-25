@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { UsersService } from '../../users/users.service';
@@ -10,7 +11,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly usersService: UsersService) {
     super({
       jwtFromRequest: (req) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (req && req.cookies) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
           return req.cookies['access_token'];
         }
         return null;

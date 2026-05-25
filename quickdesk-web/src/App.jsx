@@ -11,6 +11,7 @@ import DashboardPage from './modules/tickets/pages/DashboardPage';
 import TicketDetailPage from './modules/tickets/pages/TicketDetailPage';
 import MetricsPage from './modules/metrics/pages/MetricsPage';
 import RBACManagementPage from './modules/rbac/pages/RBACManagementPage';
+import KnowledgeBaseUploadPage from './modules/admin/pages/KnowledgeBaseUploadPage';
 import { ROLES } from './constants/rbac';
 import { Toaster } from 'react-hot-toast';
 
@@ -68,6 +69,14 @@ export default function App() {
                 element={
                   <ProtectedRoute role={ROLES.ADMIN}>
                     <RBACManagementPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/knowledge-base"
+                element={
+                  <ProtectedRoute role={ROLES.ADMIN}>
+                    <KnowledgeBaseUploadPage />
                   </ProtectedRoute>
                 }
               />
