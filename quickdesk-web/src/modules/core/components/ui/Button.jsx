@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 const variantClasses = {
-  primary: 'bg-white hover:bg-blue-50 text-blue-800 border-transparent shadow-sm',
+  primary: 'bg-white hover:bg-white text-blue-800 border-transparent shadow-sm',
   secondary: 'bg-white hover:bg-gray-50 text-gray-700  shadow',
   danger: 'bg-red-600 hover:bg-red-700 text-white border-transparent shadow-sm',
   ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent',

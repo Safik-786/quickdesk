@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -126,5 +127,26 @@ export class TicketsController {
     @CurrentUser() user: JwtUser,
   ) {
     return this.ticketsService.resolveTicket(id, user.id);
+  }
+
+  // Employee: Update own ticket (only open tickets)
+  @Patch(':id')
+  @Roles('EMPLOYEE')
+  update(
+    @Param('id') id: string,
+    @Body() dto: CreateTicketDto,
+    @CurrentUser() user: JwtUser,
+  ) {
+    return this.ticketsService.updateTicket(id, dto, user.id);
+  }
+
+  // Employee: Delete own ticket (soft delete - close the ticket)
+  @Delete(':id')
+  @Roles('EMPLOYEE')
+  delete(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtUser,
+  ) {
+    return this.ticketsService.deleteTicket(id, user.id);
   }
 }

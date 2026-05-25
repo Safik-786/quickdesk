@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useDeleteTicket } from '../tickets.hooks';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
 
@@ -46,9 +48,11 @@ export default function TicketTable({
   totalPages = 1,
   totalItems = 0,
   onPageChange,
-  onView
+  onView,
+  onEdit
 }) {
   const itemsPerPage = 10;
+  const [deletingId, setDeletingId] = useState(null);
 
   const handlePrev = () => {
     if (currentPage > 1 && onPageChange) onPageChange(currentPage - 1);
@@ -79,55 +83,114 @@ export default function TicketTable({
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
               <th scope="col" className="relative px-6 py-3">
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">View</span>
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {tickets.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan="8" className="px-6 py-4 text-center text-sm text-gray-500">
                   No tickets found.
                 </td>
               </tr>
             ) : (
-              tickets.map((ticket) => (
-                <tr key={ticket.id || ticket._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 line-clamp-1 max-w-xs">{ticket.title}</div>
-                    <div className="text-sm text-gray-500 line-clamp-1 max-w-xs">{ticket.description}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <ScreenshotStack screenshots={ticket.screenshots} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{ticket.customer?.name || 'Customer'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${statusColors[ticket.status] || statusColors.open}`}>
-                      {ticket.status?.charAt(0).toUpperCase() + ticket.status?.slice(1)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(ticket.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    {onView ? (
-                      <button
-                        onClick={() => onView(ticket)}
-                        className="text-indigo-600 hover:text-indigo-900 font-semibold cursor-pointer"
-                      >
-                        View
-                      </button>
-                    ) : (
-                      <Link to={`/tickets/${ticket.id || ticket._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold">
-                        View
-                      </Link>
-                    )}
-                  </td>
-                </tr>
-              ))
+              tickets.map((ticket) => {
+                const DeleteButton = () => {
+                  const deleteTicketMutation = useDeleteTicket(ticket.id || ticket._id);
+                  const [isDeleting, setIsDeleting] = useState(false);
+
+                  const handleDelete = async () => {
+                    if (!window.confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) {
+                      return;
+                    }
+                    setIsDeleting(true);
+                    try {
+                      await deleteTicketMutation.mutateAsync();
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  };
+
+                  if (ticket.status !== 'open') {
+                    return null;
+                  }
+
+                  return (
+                    <button
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                      title="Delete ticket"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  );
+                };
+
+                return (
+                  <tr key={ticket.id || ticket._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900 line-clamp-1 max-w-xs">{ticket.title}</div>
+                      <div className="text-sm text-gray-500 line-clamp-1 max-w-xs">{ticket.description}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <ScreenshotStack screenshots={ticket.screenshots} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{ticket.customer?.name || 'Customer'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${statusColors[ticket.status] || statusColors.open}`}>
+                        {ticket.status?.charAt(0).toUpperCase() + ticket.status?.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(ticket.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex gap-2 justify-end">
+                        {onEdit && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(ticket);
+                            }}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="Edit ticket"
+                            disabled={ticket.status === 'in progress' || ticket.status === 'resolved'}
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                        )}
+                        <DeleteButton />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {onView ? (
+                        <button
+                          onClick={() => onView(ticket)}
+                          className="text-indigo-600 hover:text-indigo-900 font-semibold cursor-pointer"
+                        >
+                          View
+                        </button>
+                      ) : (
+                        <Link to={`/tickets/${ticket.id || ticket._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold">
+                          View
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

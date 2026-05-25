@@ -6,20 +6,28 @@ import { useSubmitTicket } from '../tickets.hooks';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-export default function SubmitTicketSlideover({ isOpen, onClose }) {
+export default function SubmitTicketSlideover({ isOpen, onClose, ticket, isEdit }) {
   const [form, setForm] = useState({ title: '', description: '' });
   const [screenshots, setScreenshots] = useState([]);
   const [fileError, setFileError] = useState('');
-  const { mutate: submitTicket, isPending, error, isSuccess } = useSubmitTicket();
+  const { mutate: submitTicket, isPending, error, isSuccess } = useSubmitTicket(ticket?.id || ticket?._id);
 
-  // Reset form when opened
+  // Reset or prefill form when opened
   useEffect(() => {
     if (isOpen) {
-      setForm({ title: '', description: '' });
-      setScreenshots([]);
-      setFileError('');
+      if (isEdit && ticket) {
+        setForm({
+          title: ticket.title || '',
+          description: ticket.description || '',
+        });
+        // Optionally, load screenshots if you want to show existing ones
+      } else {
+        setForm({ title: '', description: '' });
+        setScreenshots([]);
+        setFileError('');
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, isEdit, ticket]);
 
   // Clean up ObjectURLs to avoid memory leaks
   useEffect(() => {
@@ -95,8 +103,8 @@ export default function SubmitTicketSlideover({ isOpen, onClose }) {
     <Slideover
       isOpen={isOpen}
       onClose={onClose}
-      title="Create New Ticket"
-      primaryBtnText="Submit Ticket"
+      title={isEdit ? 'Edit Ticket' : 'Create New Ticket'}
+      primaryBtnText={isEdit ? 'Save Changes' : 'Submit Ticket'}
       onPrimaryClick={handleSubmit}
       primaryBtnLoading={isPending}
       secondaryBtnText="Cancel"

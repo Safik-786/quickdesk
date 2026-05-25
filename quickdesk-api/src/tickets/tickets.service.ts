@@ -290,4 +290,71 @@ export class TicketsService {
     this.eventEmitter.emit('ticket.resolved', updated);
     return updated;
   }
+
+  async updateTicket(id: string, dto: CreateTicketDto, employeeId: string) {
+    const ticket = await this.findOne(id);
+
+    // Only allow the ticket creator to update
+    if (ticket.employeeId !== employeeId) {
+      throw new ForbiddenException('You can only update your own tickets');
+    }
+
+    // Don't allow updating resolved tickets
+    if (ticket.status === 'resolved') {
+      throw new ForbiddenException('Cannot update a resolved ticket');
+    }
+
+    // Re-classify with new content
+    const classification = await this.aiClient.classify({
+      title: dto.title,
+      description: dto.description,
+    });
+
+    const updated = await this.prisma.ticket.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        description: dto.description,
+        aiCategory: classification.category,
+        aiPriority: classification.priority,
+        aiConfidence: classification.confidence,
+        // Reset agent's custom category/priority when employee updates
+        agentCategory: null,
+        agentPriority: null,
+      },
+      include: { employee: { select: { id: true, name: true, email: true } } },
+    });
+
+    this.eventEmitter.emit('ticket.updated', updated);
+    return updated;
+  }
+
+  async deleteTicket(id: string, employeeId: string) {
+    const ticket = await this.findOne(id);
+
+    // Only allow the ticket creator to delete
+    if (ticket.employeeId !== employeeId) {
+      throw new ForbiddenException('You can only delete your own tickets');
+    }
+
+    // Don't allow deleting in_progress or resolved tickets
+    if (ticket.status !== 'open') {
+      throw new ForbiddenException(
+        'Can only delete open tickets. Close the ticket first.',
+      );
+    }
+
+    // Soft delete by setting status to closed
+    const deleted = await this.prisma.ticket.update({
+      where: { id },
+      data: {
+        status: 'closed',
+        closedAt: new Date(),
+        closedReason: 'deleted_by_employee',
+      },
+    });
+
+    this.eventEmitter.emit('ticket.deleted', deleted);
+    return deleted;
+  }
 }

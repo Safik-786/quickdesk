@@ -67,14 +67,15 @@ export default function LoginPage() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               placeholder="••••••••"
             />
-
-            <Button
-              type="submit"
-              isLoading={isPending}
-              className="w-full"
-            >
-              Sign in
-            </Button>
+            <div className='bg-blue-50 p-1 rounded-xl'>
+              <Button
+                type="submit"
+                isLoading={isPending}
+                className="w-full"
+              >
+                Sign in
+              </Button>
+            </div>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">

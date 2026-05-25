@@ -6,6 +6,7 @@ import TicketTable from '../components/TicketTable';
 import FilterBar from '../components/FilterBar';
 import Button from '../../core/components/ui/Button';
 import SubmitTicketSlideover from '../components/SubmitTicketSlideover';
+import EditTicketModal from '../components/EditTicketModal';
 
 import PageHeader from '../../../components/ui/PageHeader';
 
@@ -17,7 +18,9 @@ const plusIcon = (
 
 export default function MyTicketsPage() {
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [editingTicket, setEditingTicket] = useState(null);
   const [filters, setFilters] = useState({ status: '', search: '', date: '', page: 1, limit: 10 });
   const [viewType, setViewType] = useState('card');
   const { data: response, isLoading, error } = useMyTickets(filters);
@@ -48,6 +51,16 @@ export default function MyTicketsPage() {
     navigate(`/tickets/${ticket.id || ticket._id}`);
   };
 
+  const handleEditTicket = (ticket) => {
+    setEditingTicket(ticket);
+    setIsEditOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditOpen(false);
+    setEditingTicket(null);
+  };
+
   const handlePageChange = (newPage) => {
     setFilters(prev => ({ ...prev, page: newPage }));
   };
@@ -61,9 +74,11 @@ export default function MyTicketsPage() {
             description="Track the status of your reported issues."
             className="mb-0"
           />
-          <Button iconLeft={plusIcon} onClick={() => setIsSubmitOpen(true)}>
-            New Ticket
-          </Button>
+          <div className='rounded-xl bg-blue-50 p-1'>
+            <Button iconLeft={plusIcon} onClick={() => setIsSubmitOpen(true)}>
+              New Ticket
+            </Button>
+          </div>
         </div>
 
         <div className="mb-6">
@@ -99,12 +114,13 @@ export default function MyTicketsPage() {
             totalItems={totalItems}
             onPageChange={handlePageChange}
             onView={handleViewTicket}
+            onEdit={handleEditTicket}
           />
         ) : (
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tickets.map(ticket => (
-                <TicketCard key={ticket.id || ticket._id} ticket={ticket} onView={handleViewTicket} />
+                <TicketCard key={ticket.id || ticket._id} ticket={ticket} onView={handleViewTicket} onEdit={handleEditTicket} />
               ))}
             </div>
             {/* Simple pagination for card view as well */}
@@ -135,6 +151,12 @@ export default function MyTicketsPage() {
         <SubmitTicketSlideover
           isOpen={isSubmitOpen}
           onClose={() => setIsSubmitOpen(false)}
+        />
+
+        <EditTicketModal
+          ticket={editingTicket}
+          isOpen={isEditOpen}
+          onClose={handleCloseEditModal}
         />
       </main>
     </div>

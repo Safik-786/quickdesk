@@ -81,3 +81,27 @@ export function useResolveTicket(ticketId) {
     },
   });
 }
+
+export function useEditTicket(ticketId) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => ticketsApi.update(ticketId, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.all() });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.mine() });
+    },
+  });
+}
+
+export function useDeleteTicket(ticketId) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => ticketsApi.delete(ticketId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.all() });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.mine() });
+      qc.removeQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
+    },
+  });
+}
