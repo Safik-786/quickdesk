@@ -51,7 +51,7 @@ export function SocketProvider({ children }) {
       const isAgent = user?.roles?.some(r => r.code === 'AGENT' || r.code === 'ADMIN');
       if (isAgent) {
         toast.custom((t) => (
-          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 overflow-hidden border border-slate-100`}>
+          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow rounded-2xl pointer-events-auto flex overflow-hidden border border-slate-100`}>
             <div className="flex-1 p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0 pt-0.5">
@@ -84,14 +84,14 @@ export function SocketProvider({ children }) {
                   toast.dismiss(t.id);
                   window.location.href = `/tickets/${ticket.id}`;
                 }}
-                className="w-full text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none py-1.5 px-2 rounded-md hover:bg-indigo-50 border border-transparent transition-colors"
+                className="w-full text-xs shadow font-bold text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none py-1.5 px-2 rounded-md hover:bg-indigo-50 border border-transparent transition-colors"
               >
                 View
               </button>
               <button
                 type="button"
                 onClick={() => toast.dismiss(t.id)}
-                className="w-full text-[10px] font-semibold text-slate-400 hover:text-slate-600 focus:outline-none py-1 px-2 rounded hover:bg-slate-100 transition-colors"
+                className="w-full shadow text-[10px] font-semibold text-slate-400 hover:text-slate-600 focus:outline-none py-1 px-2 rounded hover:bg-slate-100 transition-colors"
               >
                 Dismiss
               </button>
