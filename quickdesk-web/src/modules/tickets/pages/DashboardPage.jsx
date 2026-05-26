@@ -7,7 +7,7 @@ import FilterBar from '../components/FilterBar';
 import PageHeader from '../../../components/ui/PageHeader';
 
 export default function DashboardPage() {
-  const [filters, setFilters] = useState({ status: '', search: '', date: '', page: 1, limit: 10 });
+  const [filters, setFilters] = useState({ status: '', search: '', category: '', priority: '', date: '', page: 1, limit: 10 });
   const [viewType, setViewType] = useState('card');
   const { data: response, isLoading, error } = useAllTickets(filters);
 

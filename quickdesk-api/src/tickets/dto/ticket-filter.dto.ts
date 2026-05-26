@@ -2,7 +2,7 @@ import { IsOptional, IsIn, IsString } from 'class-validator';
 
 export class TicketFilterDto {
   @IsOptional()
-  @IsIn(['open', 'resolved', 'closed'])
+  @IsIn(['open', 'in_progress', 'resolved'])
   status?: string;
 
   @IsOptional()

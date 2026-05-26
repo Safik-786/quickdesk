@@ -53,6 +53,9 @@ export class TicketsService {
       include: { employee: { select: { id: true, name: true, email: true } } },
     });
 
+    // Log ticket creation in audit trail
+    await this.auditService.logTicketCreated(ticket.id, employeeId);
+
     // Emit asynchronous event for triaging notifications (Socket.IO + Email)
     this.eventEmitter.emit('ticket.created', ticket);
 
@@ -61,24 +64,45 @@ export class TicketsService {
 
   async findMine(employeeId: string, filters: TicketFilterDto = {}) {
     const where: Prisma.TicketWhereInput = { employeeId };
+    const conditions: Prisma.TicketWhereInput[] = [];
 
     if (filters.status) {
-      where.status = filters.status as Prisma.EnumTicketStatusFilter['equals'];
+      conditions.push({ status: filters.status as Prisma.EnumTicketStatusFilter['equals'] });
     }
-    if (filters.category) where.agentCategory = filters.category;
-    if (filters.priority) where.agentPriority = filters.priority;
+    if (filters.category) {
+      conditions.push({
+        OR: [
+          { agentCategory: filters.category },
+          { agentCategory: null, aiCategory: filters.category }
+        ]
+      });
+    }
+    if (filters.priority) {
+      conditions.push({
+        OR: [
+          { agentPriority: filters.priority },
+          { agentPriority: null, aiPriority: filters.priority }
+        ]
+      });
+    }
     if (filters.search) {
-      where.title = { contains: filters.search, mode: 'insensitive' };
+      conditions.push({ title: { contains: filters.search, mode: 'insensitive' } });
     }
     if (filters.date) {
       const startDate = new Date(filters.date);
       startDate.setUTCHours(0, 0, 0, 0);
       const endDate = new Date(filters.date);
       endDate.setUTCHours(23, 59, 59, 999);
-      where.createdAt = {
-        gte: startDate,
-        lte: endDate,
-      };
+      conditions.push({
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        }
+      });
+    }
+
+    if (conditions.length > 0) {
+      where.AND = conditions;
     }
 
     const page = Number(filters.page) || 1;
@@ -109,24 +133,45 @@ export class TicketsService {
 
   async findAll(filters: TicketFilterDto) {
     const where: Prisma.TicketWhereInput = {};
+    const conditions: Prisma.TicketWhereInput[] = [];
 
     if (filters.status) {
-      where.status = filters.status as Prisma.EnumTicketStatusFilter['equals'];
+      conditions.push({ status: filters.status as Prisma.EnumTicketStatusFilter['equals'] });
     }
-    if (filters.category) where.agentCategory = filters.category;
-    if (filters.priority) where.agentPriority = filters.priority;
+    if (filters.category) {
+      conditions.push({
+        OR: [
+          { agentCategory: filters.category },
+          { agentCategory: null, aiCategory: filters.category }
+        ]
+      });
+    }
+    if (filters.priority) {
+      conditions.push({
+        OR: [
+          { agentPriority: filters.priority },
+          { agentPriority: null, aiPriority: filters.priority }
+        ]
+      });
+    }
     if (filters.search) {
-      where.title = { contains: filters.search, mode: 'insensitive' };
+      conditions.push({ title: { contains: filters.search, mode: 'insensitive' } });
     }
     if (filters.date) {
       const startDate = new Date(filters.date);
       startDate.setUTCHours(0, 0, 0, 0);
       const endDate = new Date(filters.date);
       endDate.setUTCHours(23, 59, 59, 999);
-      where.createdAt = {
-        gte: startDate,
-        lte: endDate,
-      };
+      conditions.push({
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        }
+      });
+    }
+
+    if (conditions.length > 0) {
+      where.AND = conditions;
     }
 
     const page = Number(filters.page) || 1;
@@ -215,13 +260,7 @@ export class TicketsService {
       const from = ticket.agentCategory ?? ticket.aiCategory ?? '';
       updates.agentCategory = dto.category;
       auditEntries.push(
-        this.auditService.log({
-          ticketId: id,
-          agentId,
-          field: 'category',
-          from,
-          to: dto.category,
-        }),
+        this.auditService.logCategoryOverride(id, agentId, from, dto.category),
       );
     }
 
@@ -229,13 +268,7 @@ export class TicketsService {
       const from = ticket.agentPriority ?? ticket.aiPriority ?? '';
       updates.agentPriority = dto.priority;
       auditEntries.push(
-        this.auditService.log({
-          ticketId: id,
-          agentId,
-          field: 'priority',
-          from,
-          to: dto.priority,
-        }),
+        this.auditService.logPriorityOverride(id, agentId, from, dto.priority),
       );
     }
 
@@ -263,12 +296,16 @@ export class TicketsService {
       },
     });
 
+    // Log the reply in audit trail
+    await this.auditService.logReplySent(id, userId, dto.reply);
+
     // Update status to in_progress if it's the first reply and the ticket is still open
     if (ticket.status === 'open') {
       await this.prisma.ticket.update({
         where: { id },
         data: { status: 'in_progress' },
       });
+      await this.auditService.logStatusChange(id, userId, 'open', 'in_progress');
     }
 
     // Broadcast via WebSockets
@@ -283,6 +320,9 @@ export class TicketsService {
     if (ticket.status === 'resolved') {
       throw new ForbiddenException('Ticket is already resolved');
     }
+
+    // Log resolution in audit trail
+    await this.auditService.logTicketResolved(id, userId, ticket.status);
 
     const updated = await this.prisma.ticket.update({
       where: { id },

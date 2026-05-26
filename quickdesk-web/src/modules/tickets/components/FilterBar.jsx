@@ -8,8 +8,24 @@ import Dropdown from '../../core/components/ui/Dropdown';
 const STATUS_OPTIONS = [
   { value: '', label: 'All Statuses' },
   { value: 'open', label: 'Open' },
+  { value: 'in_progress', label: 'In Progress' },
   { value: 'resolved', label: 'Resolved' },
-  { value: 'closed', label: 'Closed' },
+];
+
+const CATEGORY_OPTIONS = [
+  { value: '', label: 'All Categories' },
+  { value: 'IT', label: 'IT' },
+  { value: 'HR', label: 'HR' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Admin', label: 'Admin' },
+  { value: 'Other', label: 'Other' },
+];
+
+const PRIORITY_OPTIONS = [
+  { value: '', label: 'All Priorities' },
+  { value: 'Low', label: 'Low' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'High', label: 'High' },
 ];
 
 const searchIcon = <CiSearch className="h-5 w-5" />;
@@ -71,6 +87,34 @@ export default function FilterBar({
                 placeholder="All Statuses"
               />
 
+              <Dropdown
+                value={filters.category || ''}
+                onChange={(val) =>
+                  setFilters({
+                    ...filters,
+                    category: val,
+                    page: 1,
+                  })
+                }
+                options={CATEGORY_OPTIONS}
+                buttonClassName="text-sm! py-2 w-full"
+                placeholder="All Categories"
+              />
+
+              <Dropdown
+                value={filters.priority || ''}
+                onChange={(val) =>
+                  setFilters({
+                    ...filters,
+                    priority: val,
+                    page: 1,
+                  })
+                }
+                options={PRIORITY_OPTIONS}
+                buttonClassName="text-sm! py-2 w-full"
+                placeholder="All Priorities"
+              />
+
               <Input
                 type="date"
                 value={filters.date || ''}
@@ -89,8 +133,8 @@ export default function FilterBar({
       </div>
 
       {/* Desktop filters */}
-      <div className="hidden md:flex gap-3 items-center flex-1 justify-between">
-        <div className="w-52">
+      <div className="hidden md:flex gap-3 items-center flex-1 justify-start">
+        <div className="w-40">
           <Dropdown
             value={filters.status || ''}
             onChange={(val) =>
@@ -106,7 +150,39 @@ export default function FilterBar({
           />
         </div>
 
-        <div className="w-48">
+        <div className="w-40">
+          <Dropdown
+            value={filters.category || ''}
+            onChange={(val) =>
+              setFilters({
+                ...filters,
+                category: val,
+                page: 1,
+              })
+            }
+            options={CATEGORY_OPTIONS}
+            buttonClassName="text-sm! py-2"
+            placeholder="All Categories"
+          />
+        </div>
+
+        <div className="w-40">
+          <Dropdown
+            value={filters.priority || ''}
+            onChange={(val) =>
+              setFilters({
+                ...filters,
+                priority: val,
+                page: 1,
+              })
+            }
+            options={PRIORITY_OPTIONS}
+            buttonClassName="text-sm! py-2"
+            placeholder="All Priorities"
+          />
+        </div>
+
+        <div className="w-40">
           <Input
             type="date"
             value={filters.date || ''}

@@ -44,7 +44,8 @@ export class RagService implements OnModuleInit {
 
   async retrieveRelevantDocs(
     query: string,
-    k: number = 3,
+    k: number = 5,
+    similarityThreshold: number = 0.3,
   ): Promise<{ pageContent: string; metadata: { source: string } }[]> {
     if (!this.isReady) {
       return [];
@@ -60,12 +61,18 @@ export class RagService implements OnModuleInit {
     const queryVector = Array.from(queryOutput.data);
 
     // Similarity search via pgvector: 1 - (embedding <=> queryVector) is cosine similarity
+    // Filter by similarity threshold to avoid returning irrelevant results
     const results = await this.prisma.$queryRaw<any[]>`
       SELECT id, content, source, 1 - (embedding <=> ${queryVector}::vector) as similarity
       FROM "KnowledgeChunk"
+      WHERE 1 - (embedding <=> ${queryVector}::vector) >= ${similarityThreshold}
       ORDER BY embedding <=> ${queryVector}::vector
       LIMIT ${k}
     `;
+
+    this.logger.debug(
+      `RAG query: "${query.substring(0, 50)}..." → ${results.length} results (threshold: ${similarityThreshold})`,
+    );
 
     return results.map((row) => ({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access

@@ -21,7 +21,7 @@ export default function MyTicketsPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [editingTicket, setEditingTicket] = useState(null);
-  const [filters, setFilters] = useState({ status: '', search: '', date: '', page: 1, limit: 10 });
+  const [filters, setFilters] = useState({ status: '', search: '', category: '', priority: '', date: '', page: 1, limit: 10 });
   const [viewType, setViewType] = useState('card');
   const { data: response, isLoading, error } = useMyTickets(filters);
   const [searchParams, setSearchParams] = useSearchParams();
