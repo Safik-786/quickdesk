@@ -217,14 +217,14 @@ export default function RichTextEditor({
 
       {activeTab === 'write' ? (
         <>
-          {/* Rich Text Toolbar */}
-          <div className="flex justify-between items-center rounded-t-xl w-full border-b border-slate-100 bg-white sticky top-0 z-25">
-            <div className="flex flex-wrap gap-1">
+          {/* Rich Text Toolbar - Scrollable on Mobile */}
+          <div className="flex flex-col md:flex-row justify-between items-center rounded-t-xl w-full border-b border-slate-100 bg-slate-50 sticky top-0 z-25">
+            <div className="flex flex-row overflow-x-auto hide-scrollbar gap-1.5 p-1 w-full items-center [&_button]:bg-white [&_button]:shadow-sm [&_button]:cursor-pointer [&_button]:shrink-0 [&_button]:w-7 [&_button]:h-7 [&_button]:flex [&_button]:items-center [&_button]:justify-center [&_button]:!p-0 [&_div.w-px]:shrink-0">
               {/* Bold */}
               <button
               type="button"
               onClick={() => executeCommand('bold')}
-              className={`p-1.5 rounded font-bold transition-all ${editorStates.bold ? 'bg-indigo-50 text-indigo-700 font-extrabold ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded font-bold transition-all ${editorStates.bold ? 'bg-indigo-50 text-indigo-700 font-extrabold ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Bold"
             >
               <span className="text-sm px-0.5">B</span>
@@ -233,7 +233,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('italic')}
-              className={`p-1.5 rounded italic transition-all ${editorStates.italic ? 'bg-indigo-50 text-indigo-700 font-bold ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded italic transition-all ${editorStates.italic ? 'bg-indigo-50 text-indigo-700 font-bold ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Italic"
             >
               <span className="text-sm px-0.5 font-serif">I</span>
@@ -242,7 +242,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('underline')}
-              className={`p-1.5 rounded underline transition-all ${editorStates.underline ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded underline transition-all ${editorStates.underline ? 'bg-indigo-50 text-indigo-700 ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Underline"
             >
               <span className="text-sm px-0.5">U</span>
@@ -251,7 +251,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('strikeThrough')}
-              className={`p-1.5 rounded line-through transition-all ${editorStates.strikeThrough ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded line-through transition-all ${editorStates.strikeThrough ? 'bg-indigo-50 text-indigo-700 ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Strikethrough"
             >
               <span className="text-sm px-0.5">S</span>
@@ -299,7 +299,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('insertUnorderedList')}
-              className={`p-1.5 rounded transition-all ${editorStates.bulletList ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded transition-all ${editorStates.bulletList ? 'bg-indigo-50 text-indigo-700 ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Bullet List"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -311,7 +311,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('insertOrderedList')}
-              className={`p-1.5 rounded transition-all ${editorStates.orderedList ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded transition-all ${editorStates.orderedList ? 'bg-indigo-50 text-indigo-700 ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Numbered List"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -348,7 +348,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('justifyCenter')}
-              className={`p-1.5 rounded transition-all ${editorStates.alignCenter ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded transition-all ${editorStates.alignCenter ? 'bg-indigo-50 text-indigo-700 ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Align Center"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -359,7 +359,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={() => executeCommand('justifyRight')}
-              className={`p-1.5 rounded transition-all ${editorStates.alignRight ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-gray-500 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded transition-all ${editorStates.alignRight ? 'bg-indigo-50 text-indigo-700 ' : 'text-gray-500 hover:bg-slate-50'}`}
               title="Align Right"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -471,9 +471,8 @@ export default function RichTextEditor({
             </button>
             </div>
 
-            {/* Action controls */}
-            <div className="flex items-center gap-2 pr-2">
-              {centerToolbarContent}
+            {/* Action controls (Desktop) */}
+            <div className="hidden md:flex items-center gap-2 pr-2">
               {/* Undo */}
               <button
                 type="button"
@@ -518,12 +517,14 @@ export default function RichTextEditor({
                   </svg>
                 )}
               </button>
-              {endToolbarContent}
             </div>
           </div>
 
-          {/* Editable Canvas */}
-          <div className="relative flex-grow overflow-hidden bg-white px-4 py-2 flex flex-col focus-within:ring-offset-0 focus-within:outline-none transition-all">
+
+
+          <div className="flex items-end gap-2 bg-slate-50 md:bg-white p-2 md:p-0">
+            {/* Editable Canvas */}
+            <div className="relative flex-grow overflow-hidden bg-white px-4 py-2 flex flex-col focus-within:ring-offset-0 focus-within:outline-none transition-all rounded-2xl md:rounded-none border border-slate-200 md:border-none">
             <div
               ref={editorRef}
               contentEditable={!disabled}
@@ -543,23 +544,30 @@ export default function RichTextEditor({
               style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
             />
             
-            {/* Custom Placeholder */}
-            {!value && (
-              <div className="absolute top-2 left-2 text-gray-400 text-sm pointer-events-none select-none italic">
-                {placeholder}
-              </div>
-            )}
+              {/* Custom Placeholder */}
+              {!value && (
+                <div className="absolute top-2 left-4 md:left-4 text-gray-400 text-sm pointer-events-none select-none italic">
+                  {placeholder}
+                </div>
+              )}
+            </div>
+            
+            {/* Action controls (Send, AI) next to input */}
+            <div className="flex items-center gap-1 shrink-0 mb-1 md:mb-2 md:mr-2">
+              {centerToolbarContent}
+              {endToolbarContent}
+            </div>
           </div>
           
-          {/* Quick stats footer */}
-          <div className="px-2 py-1 border-t border-slate-100 bg-slate-50/50 flex justify-between text-[10px] text-gray-500 rounded-b-xl">
-            <div className="flex gap-4">
+          {/* Quick stats footer (Restored below editor) */}
+          <div className="px-3 py-2 border-t border-slate-100 bg-slate-50/50 flex flex-row items-center justify-between text-[10px] text-gray-500 rounded-b-xl overflow-x-auto hide-scrollbar whitespace-nowrap">
+            <div className="flex gap-4 items-center">
               <span><strong>{wordCount}</strong> words</span>
               <span><strong>{charCount}</strong> characters</span>
+              <span className="hidden sm:inline">Read time: <strong>{readTime}m</strong></span>
             </div>
-            <div className="flex gap-4 items-center">
-              <span>Read time: <strong>{readTime}m</strong></span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border flex items-center gap-1 ${tone.color}`}>
+            <div className="flex gap-4 items-center shrink-0">
+              <span className={`px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 ${tone.color}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80"></span>
                 {tone.name} Tone
               </span>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRoles, useGroupedPermissions, useRolePermissions, useSyncPermissions } from '../rbac.hooks';
 import Button from '../../core/components/ui/Button';
+import Dropdown from '../../core/components/ui/Dropdown';
 
 const ACTIONS = ['READ', 'CREATE', 'UPDATE', 'DELETE', 'MANAGE'];
 
@@ -86,7 +87,20 @@ export default function RolePermissionTab() {
       {/* Left Column: Roles */}
       <div className="w-full md:w-1/4 flex flex-col space-y-2">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Roles</h3>
-        <ul className="space-y-1">
+        
+        {/* Mobile Dropdown */}
+        <div className="md:hidden">
+          <Dropdown
+            value={selectedRoleId}
+            onChange={(val) => setSelectedRoleId(val)}
+            options={roles.map(role => ({ value: role.id, label: role.name }))}
+            placeholder="Select a role"
+            buttonClassName="text-sm py-2"
+          />
+        </div>
+
+        {/* Desktop List */}
+        <ul className="hidden md:block space-y-1">
           {roles.map(role => (
             <li key={role.id}>
               <button

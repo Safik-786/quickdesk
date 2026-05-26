@@ -122,8 +122,8 @@ function Sparkle({ delay, x, y }) {
         />
         <defs>
           <linearGradient id="sparkleGrad" x1="0" y1="0" x2="12" y2="12">
-            <stop stopColor="#818cf8" />
-            <stop offset="1" stopColor="#c084fc" />
+            <stop stopColor="#60a5fa" />
+            <stop offset="1" stopColor="#2563eb" />
           </linearGradient>
         </defs>
       </svg>
@@ -148,7 +148,7 @@ export default function AIDraftLoader() {
       <motion.div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.08) 0%, transparent 70%)',
         }}
         animate={{
           opacity: [0.5, 1, 0.5],
@@ -174,7 +174,7 @@ export default function AIDraftLoader() {
         
         {/* Outer ring pulse */}
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-indigo-300/30"
+          className="absolute inset-0 rounded-full border-2 border-blue-300/30"
           animate={{
             scale: [1, 1.3, 1],
             opacity: [0.3, 0, 0.3],
@@ -186,7 +186,7 @@ export default function AIDraftLoader() {
           }}
         />
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-purple-300/20"
+          className="absolute inset-0 rounded-full border-2 border-blue-200/20"
           animate={{
             scale: [1, 1.5, 1],
             opacity: [0.2, 0, 0.2],
@@ -211,11 +211,11 @@ export default function AIDraftLoader() {
               className="absolute w-2 h-2 rounded-full"
               style={{
                 background: i % 2 === 0 
-                  ? 'linear-gradient(135deg, #818cf8, #6366f1)' 
-                  : 'linear-gradient(135deg, #c084fc, #a855f7)',
+                  ? 'linear-gradient(135deg, #60a5fa, #3b82f6)' 
+                  : 'linear-gradient(135deg, #93c5fd, #2563eb)',
                 boxShadow: i % 2 === 0 
-                  ? '0 0 8px rgba(99,102,241,0.6)' 
-                  : '0 0 8px rgba(168,85,247,0.6)',
+                  ? '0 0 8px rgba(59,130,246,0.6)' 
+                  : '0 0 8px rgba(37,99,235,0.6)',
                 top: `${50 + 45 * Math.sin((angle * Math.PI) / 180)}%`,
                 left: `${50 + 45 * Math.cos((angle * Math.PI) / 180)}%`,
                 transform: 'translate(-50%, -50%)',
@@ -245,8 +245,8 @@ export default function AIDraftLoader() {
               key={i}
               className="absolute w-1.5 h-1.5 rounded-full"
               style={{
-                background: 'linear-gradient(135deg, #a5b4fc, #e9d5ff)',
-                boxShadow: '0 0 6px rgba(165,180,252,0.5)',
+                background: 'linear-gradient(135deg, #93c5fd, #bfdbfe)',
+                boxShadow: '0 0 6px rgba(147,197,253,0.5)',
                 top: `${50 + 38 * Math.sin((angle * Math.PI) / 180)}%`,
                 left: `${50 + 38 * Math.cos((angle * Math.PI) / 180)}%`,
                 transform: 'translate(-50%, -50%)',
@@ -269,16 +269,16 @@ export default function AIDraftLoader() {
         <motion.div
           className="absolute w-20 h-20 rounded-full"
           style={{
-            background: 'radial-gradient(circle at 35% 35%, rgba(165,180,252,0.4), rgba(99,102,241,0.15), rgba(139,92,246,0.1))',
+            background: 'radial-gradient(circle at 35% 35%, rgba(147,197,253,0.4), rgba(59,130,246,0.15), rgba(37,99,235,0.1))',
             backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(165,180,252,0.2)',
+            border: '1px solid rgba(147,197,253,0.2)',
           }}
           animate={{
             scale: [1, 1.08, 1],
             boxShadow: [
-              '0 0 20px rgba(99,102,241,0.15), inset 0 0 20px rgba(165,180,252,0.1)',
-              '0 0 40px rgba(99,102,241,0.3), inset 0 0 30px rgba(165,180,252,0.2)',
-              '0 0 20px rgba(99,102,241,0.15), inset 0 0 20px rgba(165,180,252,0.1)',
+              '0 0 20px rgba(59,130,246,0.15), inset 0 0 20px rgba(147,197,253,0.1)',
+              '0 0 40px rgba(59,130,246,0.3), inset 0 0 30px rgba(147,197,253,0.2)',
+              '0 0 20px rgba(59,130,246,0.15), inset 0 0 20px rgba(147,197,253,0.1)',
             ],
           }}
           transition={{
@@ -297,12 +297,12 @@ export default function AIDraftLoader() {
           <svg width="48" height="48" viewBox="0 0 60 60" fill="none">
             <defs>
               <linearGradient id="nodeGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop stopColor="#818cf8" />
-                <stop offset="1" stopColor="#a855f7" />
+                <stop stopColor="#60a5fa" />
+                <stop offset="1" stopColor="#2563eb" />
               </linearGradient>
               <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop stopColor="#818cf8" stopOpacity="0.6" />
-                <stop offset="1" stopColor="#c084fc" stopOpacity="0.3" />
+                <stop stopColor="#60a5fa" stopOpacity="0.6" />
+                <stop offset="1" stopColor="#3b82f6" stopOpacity="0.3" />
               </linearGradient>
             </defs>
 
@@ -326,7 +326,7 @@ export default function AIDraftLoader() {
       {/* Animated text */}
       <div className="relative h-14 flex flex-col items-center gap-2">
         <motion.h3
-          className="text-base font-semibold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent"
+          className="text-base font-semibold bg-gradient-to-r from-blue-600 via-blue-400 to-blue-600 bg-clip-text text-transparent"
           style={{ backgroundSize: '200% 100%' }}
           animate={{
             backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
@@ -368,7 +368,7 @@ export default function AIDraftLoader() {
         <motion.div
           className="h-full rounded-full"
           style={{
-            background: 'linear-gradient(90deg, #818cf8, #a855f7, #818cf8)',
+            background: 'linear-gradient(90deg, #60a5fa, #2563eb, #60a5fa)',
             backgroundSize: '200% 100%',
           }}
           animate={{
@@ -387,7 +387,7 @@ export default function AIDraftLoader() {
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-1.5 h-1.5 rounded-full bg-indigo-400"
+            className="w-1.5 h-1.5 rounded-full bg-blue-400"
             animate={{
               y: [0, -6, 0],
               opacity: [0.4, 1, 0.4],

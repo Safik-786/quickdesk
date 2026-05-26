@@ -56,7 +56,7 @@ export default function FilterBar({
 
           {/* Mobile filter dropdown */}
           {showFilters && (
-            <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-xl shadow-lg p-4 flex flex-col gap-4 md:hidden min-w-[250px]">
+            <div className="absolute right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-xl shadow-lg p-4 flex flex-col gap-4 md:hidden min-w-[250px]">
               <Dropdown
                 value={filters.status || ''}
                 onChange={(val) =>

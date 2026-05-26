@@ -41,7 +41,7 @@ export default function App() {
 
               {/* Agent routes */}
               <Route
-                path="/dashboard"
+                path="/ticket-manager"
                 element={
                   <ProtectedRoute role={ROLES.AGENT}>
                     <DashboardPage />
@@ -57,7 +57,7 @@ export default function App() {
                 }
               />
               <Route
-                path="/metrics"
+                path="/dashboard"
                 element={
                   <ProtectedRoute role={ROLES.AGENT}>
                     <MetricsPage />

@@ -108,7 +108,7 @@ export function SocketProvider({ children }) {
       const isEmployee = user?.roles?.some(r => r.code === 'EMPLOYEE');
       if (isEmployee) {
         toast.custom((t) => (
-          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 overflow-hidden border border-slate-100`}>
+          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex  overflow-hidden border border-slate-100`}>
             <div className="flex-1 p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0 pt-0.5">
@@ -155,7 +155,7 @@ export function SocketProvider({ children }) {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
 
       toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 overflow-hidden border border-slate-100`}>
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex  overflow-hidden border border-slate-100`}>
           <div className="flex-1 p-4">
             <div className="flex items-start">
               <div className="flex-shrink-0 pt-0.5">

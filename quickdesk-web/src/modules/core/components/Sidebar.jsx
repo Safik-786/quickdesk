@@ -20,6 +20,17 @@ export default function Sidebar() {
       path: '/dashboard',
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+      // Using proper permission checking
+      show: hasPermission(PERMISSIONS.METRICS_READ) || isAdmin
+    },
+    {
+      name: 'Ticket Hub',
+      path: '/ticket-manager',
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
       ),
@@ -36,17 +47,7 @@ export default function Sidebar() {
       ),
       show: !userRoleCodes.includes(ROLES.AGENT) && !isAdmin
     },
-    {
-      name: 'Metrics',
-      path: '/metrics',
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-      // Using proper permission checking
-      show: hasPermission(PERMISSIONS.METRICS_READ) || isAdmin
-    },
+
     {
       name: 'RBAC Control',
       path: '/rbac',
@@ -58,7 +59,7 @@ export default function Sidebar() {
       show: isAdmin
     },
     {
-      name: 'Knowledge Base',
+      name: 'Brain Hub',
       path: '/admin/knowledge-base',
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,10 +92,9 @@ export default function Sidebar() {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex  ${isCollapsed ? 'flex-col items-center justify-center' : 'items-start'} px-3 py-2.5 text-sm font-medium rounded-e-full transition-all duration-200 group ${
-                isActive
-                  ? 'bg-blue-50  text-blue-800 shadow'
-                  : 'text-blue-950 hover:bg-black/5 hover:text-blue-900'
+              `flex  ${isCollapsed ? 'flex-col items-center justify-center' : 'items-start'} px-3 py-2.5 text-sm font-medium rounded-e-full transition-all duration-200 group ${isActive
+                ? 'bg-blue-50  text-blue-800 shadow'
+                : 'text-blue-950 hover:bg-black/5 hover:text-blue-900'
               }`
             }
             title={isCollapsed ? item.name : ''}
@@ -109,7 +109,7 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      
+
       <div className="p-2 border-t border-slate-200">
         <div className={`flex items-center p-3 bg-slate-50 shadow-inner rounded-xl ${isCollapsed ? 'justify-center' : ''}`}>
           <div className="w-2 h-2 flex-shrink-0 rounded-full bg-green-500 mr-2 animate-pulse"></div>

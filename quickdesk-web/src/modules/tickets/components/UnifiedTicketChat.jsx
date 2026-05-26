@@ -120,89 +120,99 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
     <div className="flex flex-col h-full bg-white overflow-hidden rounded-xl shadow-sm  overflow-hidden relative">
 
       {/* Header */}
-      <div className="px-2 py-2 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
-        <div className="flex items-center gap-4">
-          <div className='p-1 bg-blue-50 rounded-xl'>
+      <div className="p-1 md:p-1.5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center bg-white shrink-0 gap-1">
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className='p-1 bg-blue-50 rounded-xl shrink-0'>
             <Button
               variant="secondary"
               size="sm"
               onClick={() => navigate(-1)}
-              className=""
+              className="px-2! py-1!"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </Button>
           </div>
-          <div>
-            <h2 className="font-semibold text-gray-900 text-sm uppercase">{ticket.title}</h2>
-            <p className="text-[8px] uppercase text-gray-500">Ticket #{ticket.id.substring(0, 8)} • Reported by <span className='text-blue-500 font-bold'>{ticket.employee?.name || 'User'}</span></p>
+          <div className="min-w-0">
+            <h2 className="font-semibold text-gray-900 text-sm uppercase truncate">{ticket.title}</h2>
+            <p className="text-[8px] uppercase text-gray-500 truncate">Ticket #{ticket.id.substring(0, 8)} • Reported by <span className='text-blue-500 font-bold'>{ticket.employee?.name || 'User'}</span></p>
           </div>
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-row items-center gap-1.5 md:gap-3 w-full md:w-auto justify-start md:justify-end pb-1 md:pb-0">
           {!isTicketClosed && (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => resolveTicket()}
-              isLoading={isResolving}
-              className="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-200"
-              iconLeft={
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              }
-            >
-              Resolve
-            </Button>
+            <div className="shrink-0">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => resolveTicket()}
+                isLoading={isResolving}
+                className="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-200 text-[10px] md:text-xs px-2 py-1 md:px-3 md:py-1.5 h-6 md:h-7 min-h-0"
+                iconLeft={
+                  <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                }
+              >
+                Resolve
+              </Button>
+            </div>
           )}
 
           {/* Horizontal Actions (Agent Only) */}
           {isAgent && (
-            <div className="flex items-center py-2 gap-3">
-            <div className="w-32">
-              <Dropdown
-                value={ticket.status}
-                onChange={(status) => overrideTicket({ status })}
-                options={STATUS_OPTIONS}
-                disabled={isOverriding}
-                size="xs"
-              />
+            <div className="flex flex-row items-center gap-1 md:gap-2 shrink-0">
+              <div className="w-[72px] sm:w-28 md:w-28 shrink-0">
+                <Dropdown
+                  value={ticket.status}
+                  onChange={(status) => overrideTicket({ status })}
+                  options={STATUS_OPTIONS}
+                  disabled={isOverriding}
+                  buttonClassName="text-[10px] md:text-xs py-0.5 md:py-1 h-6 md:h-7 !pl-1.5 !pr-4 md:!pl-3.5 md:!pr-10"
+                  iconClassName="w-3 h-3 md:w-4 md:h-4"
+                  wrapperClassName="p-0 bg-transparent md:bg-blue-50 md:p-1"
+                />
+              </div>
+              <div className="w-[72px] sm:w-28 md:w-28 shrink-0">
+                <Dropdown
+                  value={ticket.agentCategory || ticket.aiCategory || 'Other'}
+                  onChange={(category) => overrideTicket({ category })}
+                  options={CATEGORY_OPTIONS}
+                  disabled={isOverriding}
+                  buttonClassName="text-[10px] md:text-xs py-0.5 md:py-1 h-6 md:h-7 !pl-1.5 !pr-4 md:!pl-3.5 md:!pr-10"
+                  iconClassName="w-3 h-3 md:w-4 md:h-4"
+                  wrapperClassName="p-0 bg-transparent md:bg-blue-50 md:p-1"
+                />
+              </div>
+              <div className="w-[72px] sm:w-28 md:w-28 shrink-0">
+                <Dropdown
+                  value={ticket.agentPriority || ticket.aiPriority || 'Low'}
+                  onChange={(priority) => overrideTicket({ priority })}
+                  options={PRIORITY_OPTIONS}
+                  disabled={isOverriding}
+                  buttonClassName="text-[10px] md:text-xs py-0.5 md:py-1 h-6 md:h-7 !pl-1.5 !pr-4 md:!pl-3.5 md:!pr-10"
+                  iconClassName="w-3 h-3 md:w-4 md:h-4"
+                  wrapperClassName="p-0 bg-transparent md:bg-blue-50 md:p-1"
+                />
+              </div>
+              <div className="hidden sm:block h-6 w-px bg-slate-300 mx-1"></div>
+              <div className="shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsAuditOpen(true)}
+                  className="text-slate-600 hover:text-slate-900 border-slate-300 bg-white text-[10px] md:text-xs px-2 py-1 md:px-3 md:py-1.5 h-6 md:h-7 min-h-0 hidden sm:flex"
+                >
+                  <svg className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  View History
+                </Button>
+              </div>
             </div>
-            <div className="w-32">
-              <Dropdown
-                value={ticket.agentCategory || ticket.aiCategory || 'Other'}
-                onChange={(category) => overrideTicket({ category })}
-                options={CATEGORY_OPTIONS}
-                disabled={isOverriding}
-                size="xs"
-              />
-            </div>
-            <div className="w-32">
-              <Dropdown
-                value={ticket.agentPriority || ticket.aiPriority || 'Low'}
-                onChange={(priority) => overrideTicket({ priority })}
-                options={PRIORITY_OPTIONS}
-                disabled={isOverriding}
-                size="xs"
-              />
-            </div>
-            <div className="h-6 w-px bg-slate-300 mx-1"></div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsAuditOpen(true)}
-              className="text-slate-600 hover:text-slate-900 border-slate-300 bg-white"
-            >
-              <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              View History
-            </Button>
-          </div>
-        )}
+          )}
         </div>
       </div>
 
@@ -339,10 +349,7 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
           }
         >
           {isDraftLoading ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-              <p className="text-sm text-gray-500">Generating AI suggestion...</p>
-            </div>
+            <AIDraftLoader />
           ) : draft?.draft ? (
             <AIDraftEditor
               draftText={draft.draft}
@@ -376,27 +383,29 @@ export default function UnifiedTicketChat({ ticket, isAgent = false }) {
                     }}
                     disabled={isDraftLoading}
                     isLoading={isDraftLoading}
-                    className="text-indigo-600 whitespace-nowrap hover:text-indigo-800 hover:bg-indigo-50 !px-2 !py-1 h-7 text-xs ml-1"
+                    className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 !px-2 !py-1 h-8 sm:h-7 text-xs flex justify-center items-center rounded-full sm:rounded-lg"
+                    title="AI Reply"
                   >
-                    <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                     </svg>
-                    {isDraftLoading ? 'Generating...' : 'AI Reply'}
+                    <span className="hidden sm:inline">{isDraftLoading ? 'Generating...' : 'AI Reply'}</span>
                   </Button>
                 ) : null
               }
               endToolbarContent={
-                <div className="pl-2 ml-1 border-l border-slate-200 h-6 flex items-center">
-                  <div className='p-1 bg-blue-50 rounded-xl'>
+                <div className="flex items-center">
+                  <div className='p-1 bg-blue-50 rounded-full sm:rounded-xl'>
                     <Button
                       onClick={handleReply}
                       disabled={!replyText.trim()}
                       isLoading={isReplying}
                       size="sm"
-                      className="px-4 shadow-sm h-7 text-xs flex items-center"
+                      className="w-8 h-8 sm:w-auto sm:px-4 sm:h-7 text-xs flex justify-center items-center rounded-full sm:rounded-lg shadow-sm"
+                      title="Send"
                     >
-                      <span>Send</span>
-                      <svg className="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <span className="hidden sm:inline">Send</span>
+                      <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5 sm:ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                       </svg>
                     </Button>
