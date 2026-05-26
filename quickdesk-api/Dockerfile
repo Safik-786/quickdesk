@@ -1,4 +1,7 @@
-FROM node:24-alpine
+FROM node:24-slim
+
+# Install OpenSSL for Prisma and other native dependencies if needed
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 

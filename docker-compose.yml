@@ -20,7 +20,6 @@ services:
     build:
       context: ./quickdesk-api
       dockerfile: Dockerfile
-    container_name: quickdesk-api
     ports:
       - "3000:3000"
     env_file:
