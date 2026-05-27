@@ -19,14 +19,19 @@ export default function RegisterPage() {
       return;
     }
 
-    const { confirmPassword, ...registerPayload } = form;
-
-    register(registerPayload, {
-      onSuccess: () => {
-        toast.success('Account created successfully. Please sign in.');
-        navigate('/login', { replace: true });
+    register(
+      {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success('Account created successfully. Please sign in.');
+          navigate('/login', { replace: true });
+        },
+      }
+    );
   };
 
   return (

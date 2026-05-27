@@ -42,7 +42,7 @@ export default function AuthLayout({ children }) {
         
         {/* Left Side: Image Slider (hidden on small screens) */}
         <div className="hidden md:flex md:w-1/2 relative bg-gray-900 overflow-hidden">
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             <motion.div
               key={currentSlide}
               initial={{ opacity: 0, scale: 1.05 }}
@@ -54,9 +54,9 @@ export default function AuthLayout({ children }) {
               <img 
                 src={slides[currentSlide].image} 
                 alt="Presentation" 
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
+                className="absolute inset-0 w-full h-full object-cover opacity-85"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-gray-900/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-gray-900/50 to-gray-900/20" />
             </motion.div>
           </AnimatePresence>
 

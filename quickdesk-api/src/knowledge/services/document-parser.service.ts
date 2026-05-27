@@ -1,5 +1,5 @@
 import { Injectable, UnsupportedMediaTypeException } from '@nestjs/common';
-import pdfParse from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 
 @Injectable()
 export class DocumentParserService {
@@ -24,14 +24,11 @@ export class DocumentParserService {
 
   private async parsePdf(buffer: Buffer): Promise<string> {
     try {
-      const parsePdfFunc: any = pdfParse;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      const data: any = await parsePdfFunc(buffer);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+      const parser = new PDFParse({ data: buffer });
+      const data = await parser.getText();
       return data.text;
     } catch (error: any) {
       throw new Error(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         `Failed to parse PDF file: ${error?.message || 'Unknown error'}`,
       );
     }

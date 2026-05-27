@@ -21,13 +21,14 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existing = await this.usersService.findByEmail(dto.email);
+    const emailTrimmed = dto.email ? dto.email.trim() : '';
+    const existing = await this.usersService.findByEmail(emailTrimmed);
     if (existing) throw new ConflictException('Email already in use');
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = await this.usersService.create({
-      email: dto.email,
-      name: dto.name,
+      email: emailTrimmed,
+      name: dto.name ? dto.name.trim() : '',
       passwordHash,
     });
 
@@ -48,7 +49,8 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.usersService.findByEmail(dto.email);
+    const emailTrimmed = dto.email ? dto.email.trim() : '';
+    const user = await this.usersService.findByEmail(emailTrimmed);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);

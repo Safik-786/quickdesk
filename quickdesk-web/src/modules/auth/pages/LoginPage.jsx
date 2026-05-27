@@ -24,13 +24,19 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(form, {
-      onSuccess: (data) => {
-        const userRoleCodes = data.user.roles?.map(r => r.code) || [];
-        const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/ticket-manager';
-        navigate(dest, { replace: true });
+    login(
+      {
+        email: form.email.trim(),
+        password: form.password,
       },
-    });
+      {
+        onSuccess: (data) => {
+          const userRoleCodes = data.user.roles?.map(r => r.code) || [];
+          const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/ticket-manager';
+          navigate(dest, { replace: true });
+        },
+      }
+    );
   };
 
   return (
