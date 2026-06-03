@@ -10,7 +10,7 @@ export default function MetricsPage() {
     <div className="min-h-screen rounded-xl shadow bg-white">
       <main className="max-w-7xl mx-auto px-4 sm:p-6">
         <PageHeader 
-          title="System Metrics" 
+          title="Dashboard" 
           description="Overview of support ticket performance and statistics." 
         />
 

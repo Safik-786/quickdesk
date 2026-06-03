@@ -53,6 +53,9 @@ export class TicketsService {
       include: { employee: { select: { id: true, name: true, email: true } } },
     });
 
+    // Log ticket creation in audit trail
+    await this.auditService.logTicketCreated(ticket.id, employeeId);
+
     // Emit asynchronous event for triaging notifications (Socket.IO + Email)
     this.eventEmitter.emit('ticket.created', ticket);
 
@@ -61,24 +64,45 @@ export class TicketsService {
 
   async findMine(employeeId: string, filters: TicketFilterDto = {}) {
     const where: Prisma.TicketWhereInput = { employeeId };
+    const conditions: Prisma.TicketWhereInput[] = [];
 
     if (filters.status) {
-      where.status = filters.status as Prisma.EnumTicketStatusFilter['equals'];
+      conditions.push({ status: filters.status as Prisma.EnumTicketStatusFilter['equals'] });
     }
-    if (filters.category) where.agentCategory = filters.category;
-    if (filters.priority) where.agentPriority = filters.priority;
+    if (filters.category) {
+      conditions.push({
+        OR: [
+          { agentCategory: filters.category },
+          { agentCategory: null, aiCategory: filters.category }
+        ]
+      });
+    }
+    if (filters.priority) {
+      conditions.push({
+        OR: [
+          { agentPriority: filters.priority },
+          { agentPriority: null, aiPriority: filters.priority }
+        ]
+      });
+    }
     if (filters.search) {
-      where.title = { contains: filters.search, mode: 'insensitive' };
+      conditions.push({ title: { contains: filters.search, mode: 'insensitive' } });
     }
     if (filters.date) {
       const startDate = new Date(filters.date);
       startDate.setUTCHours(0, 0, 0, 0);
       const endDate = new Date(filters.date);
       endDate.setUTCHours(23, 59, 59, 999);
-      where.createdAt = {
-        gte: startDate,
-        lte: endDate,
-      };
+      conditions.push({
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        }
+      });
+    }
+
+    if (conditions.length > 0) {
+      where.AND = conditions;
     }
 
     const page = Number(filters.page) || 1;
@@ -109,24 +133,45 @@ export class TicketsService {
 
   async findAll(filters: TicketFilterDto) {
     const where: Prisma.TicketWhereInput = {};
+    const conditions: Prisma.TicketWhereInput[] = [];
 
     if (filters.status) {
-      where.status = filters.status as Prisma.EnumTicketStatusFilter['equals'];
+      conditions.push({ status: filters.status as Prisma.EnumTicketStatusFilter['equals'] });
     }
-    if (filters.category) where.agentCategory = filters.category;
-    if (filters.priority) where.agentPriority = filters.priority;
+    if (filters.category) {
+      conditions.push({
+        OR: [
+          { agentCategory: filters.category },
+          { agentCategory: null, aiCategory: filters.category }
+        ]
+      });
+    }
+    if (filters.priority) {
+      conditions.push({
+        OR: [
+          { agentPriority: filters.priority },
+          { agentPriority: null, aiPriority: filters.priority }
+        ]
+      });
+    }
     if (filters.search) {
-      where.title = { contains: filters.search, mode: 'insensitive' };
+      conditions.push({ title: { contains: filters.search, mode: 'insensitive' } });
     }
     if (filters.date) {
       const startDate = new Date(filters.date);
       startDate.setUTCHours(0, 0, 0, 0);
       const endDate = new Date(filters.date);
       endDate.setUTCHours(23, 59, 59, 999);
-      where.createdAt = {
-        gte: startDate,
-        lte: endDate,
-      };
+      conditions.push({
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        }
+      });
+    }
+
+    if (conditions.length > 0) {
+      where.AND = conditions;
     }
 
     const page = Number(filters.page) || 1;
@@ -168,6 +213,7 @@ export class TicketsService {
           include: { user: { select: { id: true, name: true, email: true } } },
           orderBy: { createdAt: 'asc' },
         },
+        resolvedBy: { select: { id: true, name: true, email: true } },
       },
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
@@ -177,9 +223,22 @@ export class TicketsService {
   async getDraftReply(id: string): Promise<DraftReplyResult> {
     const ticket = await this.findOne(id);
 
+    // Build conversation history from existing replies
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const conversationHistory = (ticket.replies || []).map((reply: any) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      sender: reply.user?.name || 'Unknown',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      message: reply.message,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      timestamp: new Date(reply.createdAt).toISOString(),
+    }));
+
     const result = await this.aiClient.draftReply({
       title: ticket.title,
       description: ticket.description,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      conversationHistory,
     });
 
     // Store the AI draft on the ticket
@@ -201,13 +260,7 @@ export class TicketsService {
       const from = ticket.agentCategory ?? ticket.aiCategory ?? '';
       updates.agentCategory = dto.category;
       auditEntries.push(
-        this.auditService.log({
-          ticketId: id,
-          agentId,
-          field: 'category',
-          from,
-          to: dto.category,
-        }),
+        this.auditService.logCategoryOverride(id, agentId, from, dto.category),
       );
     }
 
@@ -215,13 +268,7 @@ export class TicketsService {
       const from = ticket.agentPriority ?? ticket.aiPriority ?? '';
       updates.agentPriority = dto.priority;
       auditEntries.push(
-        this.auditService.log({
-          ticketId: id,
-          agentId,
-          field: 'priority',
-          from,
-          to: dto.priority,
-        }),
+        this.auditService.logPriorityOverride(id, agentId, from, dto.priority),
       );
     }
 
@@ -235,8 +282,9 @@ export class TicketsService {
       throw new ForbiddenException('Ticket is already resolved');
     }
 
-    // Determine if user is agent or employee based on logic in controller, 
+    // Determine if user is agent or employee based on logic in controller,
     // but here we just create a reply
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const reply = await this.prisma.ticketReply.create({
       data: {
         ticketId: id,
@@ -245,20 +293,25 @@ export class TicketsService {
       },
       include: {
         user: { select: { id: true, name: true, email: true } },
-      }
+      },
     });
+
+    // Log the reply in audit trail
+    await this.auditService.logReplySent(id, userId, dto.reply);
 
     // Update status to in_progress if it's the first reply and the ticket is still open
     if (ticket.status === 'open') {
       await this.prisma.ticket.update({
         where: { id },
-        data: { status: 'in_progress' }
+        data: { status: 'in_progress' },
       });
+      await this.auditService.logStatusChange(id, userId, 'open', 'in_progress');
     }
 
     // Broadcast via WebSockets
     this.gateway.broadcastTicketReply(id, reply);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return reply;
   }
 
@@ -267,6 +320,9 @@ export class TicketsService {
     if (ticket.status === 'resolved') {
       throw new ForbiddenException('Ticket is already resolved');
     }
+
+    // Log resolution in audit trail
+    await this.auditService.logTicketResolved(id, userId, ticket.status);
 
     const updated = await this.prisma.ticket.update({
       where: { id },
@@ -280,5 +336,69 @@ export class TicketsService {
 
     this.eventEmitter.emit('ticket.resolved', updated);
     return updated;
+  }
+
+  async updateTicket(id: string, dto: CreateTicketDto, employeeId: string) {
+    const ticket = await this.findOne(id);
+
+    // Only allow the ticket creator to update
+    if (ticket.employeeId !== employeeId) {
+      throw new ForbiddenException('You can only update your own tickets');
+    }
+
+    // Don't allow updating resolved tickets
+    if (ticket.status === 'resolved') {
+      throw new ForbiddenException('Cannot update a resolved ticket');
+    }
+
+    // Re-classify with new content
+    const classification = await this.aiClient.classify({
+      title: dto.title,
+      description: dto.description,
+    });
+
+    const updated = await this.prisma.ticket.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        description: dto.description,
+        aiCategory: classification.category,
+        aiPriority: classification.priority,
+        aiConfidence: classification.confidence,
+        // Reset agent's custom category/priority when employee updates
+        agentCategory: null,
+        agentPriority: null,
+      },
+      include: { employee: { select: { id: true, name: true, email: true } } },
+    });
+
+    this.eventEmitter.emit('ticket.updated', updated);
+    return updated;
+  }
+
+  async deleteTicket(id: string, employeeId: string) {
+    const ticket = await this.findOne(id);
+
+    // Only allow the ticket creator to delete
+    if (ticket.employeeId !== employeeId) {
+      throw new ForbiddenException('You can only delete your own tickets');
+    }
+
+    // Don't allow deleting in_progress or resolved tickets
+    if (ticket.status !== 'open') {
+      throw new ForbiddenException(
+        'Can only delete open tickets. Close the ticket first.',
+      );
+    }
+
+    // Hard delete ticket and associated audit logs
+    await this.prisma.auditLog.deleteMany({ where: { ticketId: id } });
+    
+    const deleted = await this.prisma.ticket.delete({
+      where: { id },
+    });
+
+    this.eventEmitter.emit('ticket.deleted', deleted);
+    return deleted;
   }
 }

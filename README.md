@@ -172,6 +172,16 @@ We selected **Socket.io** over SSE and native WebSockets.
 
 ---
 
+## What I would do with more time
+
+1. **Background Job Processing (BullMQ)**: Right now, vectorizing KB articles happens synchronously inside the Node.js event loop. With more time, I would offload this to a Redis-backed queue system like BullMQ to prevent event-loop blocking during heavy operations.
+2. **Comprehensive E2E Testing**: While core endpoints are functional, I would implement Cypress or Playwright to simulate the full user journey (login -> create ticket -> agent reply with AI draft -> resolve) in an automated CI/CD pipeline.
+3. **Email Notifications**: Integrate a service like Resend or SendGrid to dispatch real email updates to employees whenever an agent replies to or resolves their tickets (one of the stretch goals).
+4. **Enhanced Markdown Rendering**: Add support for rendering Mermaid charts and code highlighting inside the ticket chat bubbles for engineering-specific support tickets.
+5. **Rate Limiting Middleware**: Implement a Redis-backed rate limiter on the `/tickets` POST endpoint to prevent spam submission of tickets by limiting each employee to N tickets per hour.
+
+---
+
 ## Known Issues & Limitations
 
 1. **Local Transformers Footprint**: Initial seeder script run takes up to 30-45 seconds while downloading the local model.

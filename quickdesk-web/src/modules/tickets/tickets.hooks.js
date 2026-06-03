@@ -31,7 +31,7 @@ export function useTicketDraft(id, options = {}) {
     queryKey: queryKeys.tickets.draft(id),
     queryFn: () => ticketsApi.getDraft(id),
     enabled: !!id && (options.enabled ?? false), // manual trigger
-    staleTime: Infinity, // draft doesn't auto-refresh
+    staleTime: 0, // always re-fetch so AI gets latest conversation history
   });
 }
 
@@ -66,6 +66,7 @@ export function useReplyTicket(ticketId) {
     onSuccess: (updatedTicket) => {
       qc.invalidateQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
       qc.invalidateQueries({ queryKey: queryKeys.tickets.lists() });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.draft(ticketId) });
     },
   });
 }
@@ -77,6 +78,30 @@ export function useResolveTicket(ticketId) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
       qc.invalidateQueries({ queryKey: queryKeys.tickets.lists() });
+    },
+  });
+}
+
+export function useEditTicket(ticketId) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => ticketsApi.update(ticketId, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.all() });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.mine() });
+    },
+  });
+}
+
+export function useDeleteTicket(ticketId) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => ticketsApi.delete(ticketId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.all() });
+      qc.invalidateQueries({ queryKey: queryKeys.tickets.mine() });
+      qc.removeQueries({ queryKey: queryKeys.tickets.detail(ticketId) });
     },
   });
 }

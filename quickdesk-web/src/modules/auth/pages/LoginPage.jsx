@@ -17,20 +17,26 @@ export default function LoginPage() {
   // Redirect if already logged in
   if (user) {
     const userRoleCodes = user.roles?.map(r => r.code) || [];
-    const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/dashboard';
+    const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/ticket-manager';
     navigate(dest, { replace: true });
     return null;
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(form, {
-      onSuccess: (data) => {
-        const userRoleCodes = data.user.roles?.map(r => r.code) || [];
-        const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/dashboard';
-        navigate(dest, { replace: true });
+    login(
+      {
+        email: form.email.trim(),
+        password: form.password,
       },
-    });
+      {
+        onSuccess: (data) => {
+          const userRoleCodes = data.user.roles?.map(r => r.code) || [];
+          const dest = userRoleCodes.includes(ROLES.EMPLOYEE) && !userRoleCodes.includes(ROLES.ADMIN) ? '/my-tickets' : '/ticket-manager';
+          navigate(dest, { replace: true });
+        },
+      }
+    );
   };
 
   return (
@@ -67,22 +73,23 @@ export default function LoginPage() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               placeholder="••••••••"
             />
-
-            <Button
-              type="submit"
-              isLoading={isPending}
-              className="w-full"
-            >
-              Sign in
-            </Button>
+            <div className='bg-blue-50 p-1 rounded-xl'>
+              <Button
+                type="submit"
+                isLoading={isPending}
+                className="w-full"
+              >
+                Sign in
+              </Button>
+            </div>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          {/* <p className="text-center text-sm text-gray-500 mt-6">
             Don't have an account?{' '}
             <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
               Register
             </Link>
-          </p>
+          </p> */}
         </div>
 
         {/* Demo credentials */}

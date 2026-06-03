@@ -7,7 +7,7 @@ import FilterBar from '../components/FilterBar';
 import PageHeader from '../../../components/ui/PageHeader';
 
 export default function DashboardPage() {
-  const [filters, setFilters] = useState({ status: '', search: '', date: '', page: 1, limit: 10 });
+  const [filters, setFilters] = useState({ status: '', search: '', category: '', priority: '', date: '', page: 1, limit: 10 });
   const [viewType, setViewType] = useState('card');
   const { data: response, isLoading, error } = useAllTickets(filters);
 
@@ -21,10 +21,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white rounded-xl shadow">
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:p-6">
+    <div className="min-h-screen bg-white rounded-xl shadow overflow-hidden w-full max-w-full">
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:p-6 max-w-full overflow-hidden">
         <PageHeader
-          title="Agent Dashboard"
+          title="Ticket Manager"
           description="Manage and respond to customer tickets."
         />
 

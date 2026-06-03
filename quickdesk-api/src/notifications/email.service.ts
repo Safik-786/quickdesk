@@ -7,6 +7,7 @@ export class EmailService implements OnModuleInit {
   private transporter: nodemailer.Transporter;
   private fromAddress = 'quickdesk-support@gmail.com';
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async onModuleInit() {
     try {
       if (process.env.ENABLE_EMAIL === 'false') {
@@ -55,7 +56,6 @@ export class EmailService implements OnModuleInit {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       await this.transporter.sendMail({
         from: `"QuickDesk Support" <${this.fromAddress}>`,
         to,

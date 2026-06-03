@@ -68,10 +68,12 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const refreshToken = req.cookies['refresh_token'];
     if (!refreshToken)
       throw new UnauthorizedException('No refresh token provided');
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const result = await this.authService.refresh(refreshToken);
     this.setCookies(res, result.access_token, result.refresh_token);
     return { user: result.user };
@@ -80,6 +82,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getMe(@Req() req: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     const user = await this.authService.getMe(req.user.id);
     return { user };
   }

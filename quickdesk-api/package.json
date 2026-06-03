@@ -20,13 +20,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "reseed-kb": "ts-node prisma/reseed-kb.ts"
   },
   "dependencies": {
     "@langchain/community": "^1.1.28",
     "@langchain/core": "^1.1.48",
     "@langchain/google-genai": "^2.1.31",
     "@langchain/openai": "^1.4.7",
+    "@langchain/textsplitters": "^1.0.1",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.0",

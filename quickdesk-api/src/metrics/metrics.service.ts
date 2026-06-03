@@ -93,6 +93,7 @@ export class MetricsService {
 
     // ── AI Confidence analytics ──
     const confidenceValues = tickets
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       .map((t) => t.aiConfidence)
       .filter((c): c is number => c !== null && c !== undefined);
 
@@ -105,10 +106,8 @@ export class MetricsService {
                 100,
             ) / 100
           : null,
-      min:
-        confidenceValues.length > 0 ? Math.min(...confidenceValues) : null,
-      max:
-        confidenceValues.length > 0 ? Math.max(...confidenceValues) : null,
+      min: confidenceValues.length > 0 ? Math.min(...confidenceValues) : null,
+      max: confidenceValues.length > 0 ? Math.max(...confidenceValues) : null,
       total: confidenceValues.length,
       distribution: this.buildConfidenceDistribution(confidenceValues),
     };

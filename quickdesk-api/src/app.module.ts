@@ -10,6 +10,7 @@ import { SocketsModule } from './sockets/sockets.module';
 import { AiClientModule } from './ai-client/ai-client.module';
 import { EventsModule } from './events/events.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { KnowledgeModule } from './knowledge/knowledge.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     AiClientModule,
     EventsModule,
     NotificationsModule,
+    KnowledgeModule,
   ],
 })
 export class AppModule {}

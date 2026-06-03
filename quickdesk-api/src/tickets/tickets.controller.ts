@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -41,6 +42,7 @@ export class TicketsController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           const uniqueSuffix = uuidv4() + extname(file.originalname);
           cb(null, uniqueSuffix);
         },
@@ -121,10 +123,25 @@ export class TicketsController {
   // Employee: Resolve the ticket
   @Patch(':id/resolve')
   @Roles('EMPLOYEE', 'AGENT')
-  resolve(
+  resolve(@Param('id') id: string, @CurrentUser() user: JwtUser) {
+    return this.ticketsService.resolveTicket(id, user.id);
+  }
+
+  // Employee: Update own ticket (only open tickets)
+  @Patch(':id')
+  @Roles('EMPLOYEE')
+  update(
     @Param('id') id: string,
+    @Body() dto: CreateTicketDto,
     @CurrentUser() user: JwtUser,
   ) {
-    return this.ticketsService.resolveTicket(id, user.id);
+    return this.ticketsService.updateTicket(id, dto, user.id);
+  }
+
+  // Employee: Delete own ticket (soft delete - close the ticket)
+  @Delete(':id')
+  @Roles('EMPLOYEE')
+  delete(@Param('id') id: string, @CurrentUser() user: JwtUser) {
+    return this.ticketsService.deleteTicket(id, user.id);
   }
 }

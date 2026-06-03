@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { SidebarContext } from '../../../context/SidebarContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { axiosInstance } from '../../../lib/axios';
+import MobileDrawer from './MobileDrawer';
 
 const formatTimeAgo = (dateString) => {
   const date = new Date(dateString);
@@ -21,10 +22,11 @@ const formatTimeAgo = (dateString) => {
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const { toggleSidebar } = useContext(SidebarContext);
+  const { toggleSidebar, toggleDrawer } = useContext(SidebarContext);
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [isBellOpen, setIsBellOpen] = useState(false);
   const bellRef = useRef(null);
@@ -42,6 +44,16 @@ export default function Header() {
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const { data: notifications = [] } = useQuery({
@@ -89,23 +101,26 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 sticky top-0 transition-all duration-300">
-      <div className="flex-1 flex items-center gap-3">
-        {/* Sidebar Toggle Button */}
-        <button
-          onClick={toggleSidebar}
-          className="p-2 text-gray-500 cursor-pointer hover:text-blue-800 hover:bg-blue-100 rounded-lg hover:shadow transition-colors"
-          title="Toggle sidebar"
-        >
-          <svg className="w-5 h-5" fill="blue" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        {/* Breadcrumbs or Page Title could go here */}
-        <h2 className="text-lg font-semibold text-gray-800 hidden sm:block">Welcome back <span className='font-bold  bg-gradient-to-br from-cyan-500 via-blue-700 to-blue-800 text-transparent bg-clip-text'>{user?.name} </span> </h2>
-      </div>
+    <>
+      <header className="h-16 bg-white flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 sticky top-0 transition-all duration-300">
+        <div className="flex-1 flex items-center gap-3">
+          {/* Sidebar Toggle Button */}
+          <div className='p-1 rounded-xl bg-blue-50'>
+            <button
+              onClick={() => isMobile ? toggleDrawer() : toggleSidebar()}
+              className="p-1.5 text-gray-500 shadow bg-white cursor-pointer hover:text-blue-800 hover:scale-102 rounded-lg hover:shadow transition-colors"
+              title={isMobile ? "Open menu" : "Toggle sidebar"}
+            >
+              <svg className="w-5 h-5" fill="blue" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+          {/* Breadcrumbs or Page Title could go here */}
+          <h2 className="text-lg font-semibold text-gray-800 hidden sm:block">Welcome back <span className='font-bold  bg-gradient-to-br from-cyan-500 via-blue-700 to-blue-800 text-transparent bg-clip-text'>{user?.name} </span> </h2>
+        </div>
 
-      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
         {/* Notification Bell */}
         <div className="relative animate-in fade-in duration-300" ref={bellRef}>
           <button
@@ -162,11 +177,10 @@ export default function Header() {
                       >
                         {/* Icon */}
                         <div className="flex-shrink-0 pt-0.5">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
-                            isTicketCreated 
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${isTicketCreated
                               ? 'bg-amber-50 text-amber-600 border-amber-100'
                               : 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                          }`}>
+                            }`}>
                             {isTicketCreated ? (
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -268,5 +282,7 @@ export default function Header() {
         </div>
       </div>
     </header>
+    <MobileDrawer />
+    </>
   );
 }

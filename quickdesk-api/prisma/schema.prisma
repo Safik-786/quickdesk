@@ -131,9 +131,10 @@ model AuditLog {
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   agentId   String
   agent     User     @relation(fields: [agentId], references: [id])
+  action    String   @default("OVERRIDE") // TICKET_CREATED, STATUS_CHANGED, CATEGORY_OVERRIDE, PRIORITY_OVERRIDE, REPLY_SENT, TICKET_RESOLVED
   field     String
-  fromValue String
-  toValue   String
+  fromValue String   @default("")
+  toValue   String   @default("")
   changedAt DateTime @default(now())
 }
 

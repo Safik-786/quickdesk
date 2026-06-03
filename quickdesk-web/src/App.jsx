@@ -11,6 +11,7 @@ import DashboardPage from './modules/tickets/pages/DashboardPage';
 import TicketDetailPage from './modules/tickets/pages/TicketDetailPage';
 import MetricsPage from './modules/metrics/pages/MetricsPage';
 import RBACManagementPage from './modules/rbac/pages/RBACManagementPage';
+import KnowledgeBaseUploadPage from './modules/admin/pages/KnowledgeBaseUploadPage';
 import { ROLES } from './constants/rbac';
 import { Toaster } from 'react-hot-toast';
 
@@ -40,7 +41,7 @@ export default function App() {
 
               {/* Agent routes */}
               <Route
-                path="/dashboard"
+                path="/ticket-manager"
                 element={
                   <ProtectedRoute role={ROLES.AGENT}>
                     <DashboardPage />
@@ -50,13 +51,13 @@ export default function App() {
               <Route
                 path="/tickets/:id"
                 element={
-                  <ProtectedRoute role={ROLES.AGENT}>
+                  <ProtectedRoute role={[ROLES.AGENT, ROLES.EMPLOYEE]}>
                     <TicketDetailPage />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/metrics"
+                path="/dashboard"
                 element={
                   <ProtectedRoute role={ROLES.AGENT}>
                     <MetricsPage />
@@ -68,6 +69,14 @@ export default function App() {
                 element={
                   <ProtectedRoute role={ROLES.ADMIN}>
                     <RBACManagementPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/knowledge-base"
+                element={
+                  <ProtectedRoute role={ROLES.ADMIN}>
+                    <KnowledgeBaseUploadPage />
                   </ProtectedRoute>
                 }
               />

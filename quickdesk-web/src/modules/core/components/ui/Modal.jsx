@@ -6,6 +6,7 @@ export default function Modal({
   onClose,
   title,
   children,
+  footer,
   maxWidth = 'max-w-lg',
   showCloseIcon = true
 }) {
@@ -46,10 +47,11 @@ export default function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
-        className={`relative bg-white rounded-2xl shadow-xl w-full ${maxWidth} transform transition-all overflow-hidden scale-100 opacity-100`}
+        className={`relative flex flex-col max-h-[90vh] bg-white rounded-2xl shadow-xl w-full ${maxWidth} transform transition-all overflow-hidden scale-100 opacity-100`}
       >
+        {/* Fixed Header */}
         {(title || showCloseIcon) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-100 z-10 bg-white">
             {title && <h3 id="modal-title" className="text-lg font-semibold text-gray-900">{title}</h3>}
             {showCloseIcon && (
               <button
@@ -64,9 +66,18 @@ export default function Modal({
             )}
           </div>
         )}
-        <div className="px-6 py-5">
+        
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5">
           {children}
         </div>
+
+        {/* Fixed Footer */}
+        {footer && (
+          <div className="flex-shrink-0 px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-2xl z-10">
+            {footer}
+          </div>
+        )}
       </div>
     </div>,
     document.body
